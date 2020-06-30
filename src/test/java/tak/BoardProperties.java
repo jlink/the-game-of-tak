@@ -29,9 +29,24 @@ class BoardProperties {
 	@Example
 	void emptyBoardOfSize3() {
 		TakBoard board = TakBoard.ofSize(3);
+		assertThat(board.size()).isEqualTo(3);
 		assertThat(board.at(position('a', 1)).isEmpty()).isTrue();
 		assertThat(board.at(position('c', 3)).isEmpty()).isTrue();
 
 		assertThatThrownBy(() -> board.at(position('d', 4))).isInstanceOf(TakException.class);
+	}
+
+	@Example
+	void newBoard(@ForAll TakBoard board) {
+		assertThat(board.size()).isBetween(3, 8);
+
+		Position lowerLeft = position('a', 1);
+		assertThat(board.at(lowerLeft).isEmpty()).isTrue();
+		Position upperRight = position((char) ('a' + board.size() - 1), board.size());
+		assertThat(board.at(upperRight).isEmpty()).isTrue();
+
+		if (board.size() < 8) {
+			assertThatThrownBy(() -> board.at(position('h', 8))).isInstanceOf(TakException.class);
+		}
 	}
 }

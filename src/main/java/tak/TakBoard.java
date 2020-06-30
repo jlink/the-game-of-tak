@@ -8,7 +8,7 @@ public class TakBoard {
 		private final char file;
 		private final int rank;
 
-		public Position(final char file, final int rank) {
+		private Position(final char file, final int rank) {
 			this.file = file;
 			this.rank = rank;
 		}
@@ -37,7 +37,7 @@ public class TakBoard {
 		}
 
 		private int fileIndex() {
-			return file - 'a' - 1;
+			return file - 'a';
 		}
 
 		private int rankIndex() {
@@ -77,6 +77,10 @@ public class TakBoard {
 		this.squares = squares;
 	}
 
+	public int size() {
+		return size;
+	}
+
 	@Override
 	public String toString() {
 		return String.format("TakBoard(%s)", size);
@@ -102,7 +106,7 @@ public class TakBoard {
 
 	private void checkPositionAllowed(final Position position) {
 		if (position.fileIndex() >= size || position.rankIndex() >= size) {
-			String message = String.format("Position <%s> is outside the board", position);
+			String message = String.format("Position <%s> is outside %s", position, this);
 			throw new TakException(message);
 		}
 	}
