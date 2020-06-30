@@ -14,7 +14,9 @@ public class TakBoardProvider implements ArbitraryProvider {
 
 	@Override
 	public Set<Arbitrary<?>> provideFor(final TypeUsage targetType, final SubtypeProvider subtypeProvider) {
-		return Collections.singleton(Arbitraries.integers().between(3, 8).map(TakBoard::ofSize));
+		return Collections.singleton(
+				Arbitraries.integers().between(TakBoard.MIN_SIZE, TakBoard.MAX_SIZE).map(TakBoard::ofSize)
+		);
 	}
 
 }

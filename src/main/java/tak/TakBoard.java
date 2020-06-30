@@ -4,7 +4,28 @@ import java.util.*;
 import java.util.stream.*;
 
 public class TakBoard {
+
+	public static final int MIN_SIZE = 3;
+	public static final int MAX_SIZE = 8;
+
 	public static class Position {
+
+		public static List<Character> files() {
+			return IntStream.range(0, MAX_SIZE).mapToObj(Position::file).collect(Collectors.toList());
+		}
+
+		public static List<Integer> ranks() {
+			return IntStream.range(0, MAX_SIZE).mapToObj(Position::rank).collect(Collectors.toList());
+		}
+
+		private static char file(final int index) {
+			return (char) ('a' + index);
+		}
+
+		private static int rank(final int index) {
+			return index + 1;
+		}
+
 		private final char file;
 		private final int rank;
 
@@ -32,10 +53,6 @@ public class TakBoard {
 			return Objects.hash(file, rank);
 		}
 
-		public int index() {
-			return rank;
-		}
-
 		private int fileIndex() {
 			return file - 'a';
 		}
@@ -47,11 +64,11 @@ public class TakBoard {
 
 	public static Position position(final char file, final int rank) {
 		Position position = new Position(file, rank);
-		if (file < 'a' || file > 'h') {
+		if (!Position.files().contains(file)) {
 			String message = String.format("file coordinate %s is illegal", position.toString());
 			throw new IllegalArgumentException(message);
 		}
-		if (rank < 1 || rank > 8) {
+		if (!Position.ranks().contains(rank)) {
 			String message = String.format("file coordinate %s is illegal", position.toString());
 			throw new IllegalArgumentException(message);
 		}
@@ -59,6 +76,9 @@ public class TakBoard {
 	}
 
 	public static TakBoard ofSize(final int size) {
+		if (size < MIN_SIZE || size > MAX_SIZE) {
+			throw new IllegalArgumentException(String.format("Size <%s> of Tak board should be between 3 and 8", size));
+		}
 		TakSquare[] squares = initSquares(size);
 		return new TakBoard(size, squares);
 	}
@@ -81,6 +101,11 @@ public class TakBoard {
 		return size;
 	}
 
+	public TakSquare at(final Position position) {
+		checkPositionAllowed(position);
+		return squares[squareIndex(position)];
+	}
+
 	@Override
 	public String toString() {
 		return String.format("TakBoard(%s)", size);
@@ -97,11 +122,6 @@ public class TakBoard {
 	@Override
 	public int hashCode() {
 		return Arrays.hashCode(squares);
-	}
-
-	public TakSquare at(final Position position) {
-		checkPositionAllowed(position);
-		return squares[squareIndex(position)];
 	}
 
 	private void checkPositionAllowed(final Position position) {
