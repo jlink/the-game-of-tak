@@ -8,14 +8,14 @@ public class TakBoard {
 	public static final int MIN_SIZE = 3;
 	public static final int MAX_SIZE = 8;
 
-	public static class Position {
+	public static class Spot {
 
 		public static List<Character> files() {
-			return IntStream.range(0, MAX_SIZE).mapToObj(Position::file).collect(Collectors.toList());
+			return IntStream.range(0, MAX_SIZE).mapToObj(Spot::file).collect(Collectors.toList());
 		}
 
 		public static List<Integer> ranks() {
-			return IntStream.range(0, MAX_SIZE).mapToObj(Position::rank).collect(Collectors.toList());
+			return IntStream.range(0, MAX_SIZE).mapToObj(Spot::rank).collect(Collectors.toList());
 		}
 
 		private static char file(final int index) {
@@ -29,7 +29,7 @@ public class TakBoard {
 		private final char file;
 		private final int rank;
 
-		private Position(final char file, final int rank) {
+		private Spot(final char file, final int rank) {
 			this.file = file;
 			this.rank = rank;
 		}
@@ -43,7 +43,7 @@ public class TakBoard {
 		public boolean equals(final Object o) {
 			if (this == o) return true;
 			if (o == null || getClass() != o.getClass()) return false;
-			Position position = (Position) o;
+			Spot position = (Spot) o;
 			return file == position.file &&
 						   rank == position.rank;
 		}
@@ -62,13 +62,13 @@ public class TakBoard {
 		}
 	}
 
-	public static Position position(final char file, final int rank) {
-		Position position = new Position(file, rank);
-		if (!Position.files().contains(file)) {
+	public static Spot spot(final char file, final int rank) {
+		Spot position = new Spot(file, rank);
+		if (!Spot.files().contains(file)) {
 			String message = String.format("file coordinate %s is illegal", position.toString());
 			throw new IllegalArgumentException(message);
 		}
-		if (!Position.ranks().contains(rank)) {
+		if (!Spot.ranks().contains(rank)) {
 			String message = String.format("file coordinate %s is illegal", position.toString());
 			throw new IllegalArgumentException(message);
 		}
@@ -101,7 +101,7 @@ public class TakBoard {
 		return size;
 	}
 
-	public TakSquare at(final Position position) {
+	public TakSquare at(final Spot position) {
 		checkPositionAllowed(position);
 		return squares[squareIndex(position)];
 	}
@@ -124,14 +124,14 @@ public class TakBoard {
 		return Arrays.hashCode(squares);
 	}
 
-	private void checkPositionAllowed(final Position position) {
+	private void checkPositionAllowed(final Spot position) {
 		if (position.fileIndex() >= size || position.rankIndex() >= size) {
 			String message = String.format("Position <%s> is outside %s", position, this);
 			throw new TakException(message);
 		}
 	}
 
-	private int squareIndex(final Position position) {
+	private int squareIndex(final Spot position) {
 		return 0;
 	}
 }
