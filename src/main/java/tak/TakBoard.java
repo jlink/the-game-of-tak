@@ -29,6 +29,11 @@ public class TakBoard {
 		private final char file;
 		private final int rank;
 
+		private Spot(final int fileIndex, final int rankIndex) {
+			this.file = (char) (fileIndex + 'a');
+			this.rank = rankIndex + 1;
+		}
+
 		private Spot(final char file, final int rank) {
 			this.file = file;
 			this.rank = rank;
@@ -101,9 +106,60 @@ public class TakBoard {
 		return size;
 	}
 
-	public TakSquare at(final Spot position) {
-		checkPositionAllowed(position);
-		return squares[squareIndex(position)];
+	public TakSquare at(final Spot spot) {
+		checkPositionAllowed(spot);
+		return squares[spot2Index(spot)];
+	}
+
+	public Map<Spot, TakSquare> squares() {
+		Map<Spot, TakSquare> squaresMap = new LinkedHashMap<>();
+		for (int i = 0; i < squares.length; i++) {
+			squaresMap.put(index2Spot(i), squares[i]);
+		}
+		return squaresMap;
+	}
+
+	public TakBoard change(final Map<Spot, Deque<TakStone>> changes) {
+		TakBoard clone = cloneBoard();
+		for (Map.Entry<Spot, Deque<TakStone>> entry : changes.entrySet()) {
+			int index = clone.spot2Index(entry.getKey());
+			clone.squares[index] = clone.squares[index].set(entry.getValue());
+		}
+		return clone;
+	}
+
+	private TakBoard cloneBoard() {
+		TakSquare[] clonedSquares = new TakSquare[squares.length];
+		for (int i = 0; i < squares.length; i++) {
+			TakSquare clonedSquare = new TakSquare(cloneStack(squares[i].stack()));
+			clonedSquares[i] = clonedSquare;
+		}
+		return new TakBoard(size, clonedSquares);
+	}
+
+	private Deque<TakStone> cloneStack(final Deque<TakStone> stack) {
+		Deque<TakStone> clonedStack = new ArrayDeque<>();
+		for (TakStone stone : stack) {
+			clonedStack.add(TakStone.copy(stone));
+		}
+		return new ArrayDeque<>(clonedStack);
+	}
+
+	private void checkPositionAllowed(final Spot spot) {
+		if (spot.fileIndex() >= size || spot.rankIndex() >= size) {
+			String message = String.format("Position <%s> is outside %s", spot, this);
+			throw new TakException(message);
+		}
+	}
+
+	private int spot2Index(final Spot spot) {
+		return spot.rankIndex() * size + spot.fileIndex();
+	}
+
+	private Spot index2Spot(final int index) {
+		int fileIndex = index % size;
+		int rankIndex = Math.floorDiv(index, size);
+		return new Spot(fileIndex, rankIndex);
 	}
 
 	@Override
@@ -122,16 +178,5 @@ public class TakBoard {
 	@Override
 	public int hashCode() {
 		return Arrays.hashCode(squares);
-	}
-
-	private void checkPositionAllowed(final Spot position) {
-		if (position.fileIndex() >= size || position.rankIndex() >= size) {
-			String message = String.format("Position <%s> is outside %s", position, this);
-			throw new TakException(message);
-		}
-	}
-
-	private int squareIndex(final Spot position) {
-		return 0;
 	}
 }

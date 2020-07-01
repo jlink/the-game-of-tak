@@ -4,6 +4,16 @@ import java.util.*;
 
 public class TakSquare {
 
+	private final Deque<TakStone> stack;
+
+	public TakSquare() {
+		this(new ArrayDeque<>());
+	}
+
+	public TakSquare(Deque<TakStone> stack) {
+		this.stack = stack;
+	}
+
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o) return true;
@@ -17,6 +27,19 @@ public class TakSquare {
 	}
 
 	public boolean isEmpty() {
-		return true;
+		return stack.isEmpty();
+	}
+
+	public TakSquare set(final Deque<TakStone> stack) {
+		return new TakSquare(stack);
+	}
+
+	public Deque<TakStone> stack() {
+		// Copy to make it unmodifiable
+		return new ArrayDeque<>(stack);
+	}
+
+	public Optional<TakStone> top() {
+		return Optional.ofNullable(stack.peekLast());
 	}
 }
