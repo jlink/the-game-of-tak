@@ -10,6 +10,16 @@ public class TakDomain extends AbstractDomainContextBase {
 	public TakDomain() {
 		registerArbitrary(TakBoard.class, newBoards());
 		registerArbitrary(tupleOfBoardAndSpotType(), boardsAndSpots());
+		registerArbitrary(TakStone.class, stones());
+	}
+
+	private Arbitrary<TakStone> stones() {
+		Arbitrary<TakStone.Colour> colours = Arbitraries.of(TakStone.Colour.class);
+		return Arbitraries.frequencyOf(
+				Tuple.of(10, colours.map(colour -> TakStone.flat(colour))),
+				Tuple.of(5, colours.map(colour -> TakStone.flat(colour).standUp())),
+				Tuple.of(5, colours.map(colour -> TakStone.capstone(colour)))
+		);
 	}
 
 	private Arbitrary<Tuple2<TakBoard, TakBoard.Spot>> boardsAndSpots() {

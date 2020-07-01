@@ -56,7 +56,7 @@ class BoardProperties {
 		TakBoard emptyBoard = boardAndSpot.get1();
 		Spot spot = boardAndSpot.get2();
 
-		TakStone stone = new TakStone();
+		TakStone stone = TakStone.capstone(TakStone.Colour.WHITE);
 		Deque<TakStone> stack = new ArrayDeque<>(List.of(stone));
 		Map<Spot, Deque<TakStone>> changes = Map.of(spot, stack);
 		TakBoard changedBoard = emptyBoard.change(changes);
