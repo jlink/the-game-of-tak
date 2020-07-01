@@ -1,13 +1,15 @@
-package tak;
+package tak.testingSupport;
+
+import tak.*;
 
 import net.jqwik.api.*;
 import net.jqwik.api.Tuple.*;
 import net.jqwik.api.domains.*;
 import net.jqwik.api.providers.*;
 
-public class TakDomain extends AbstractDomainContextBase {
+public class TakDomainContext extends AbstractDomainContextBase {
 
-	public TakDomain() {
+	public TakDomainContext() {
 		registerArbitrary(TakBoard.class, newBoards());
 		registerArbitrary(tupleOfBoardAndSpotType(), boardsAndSpots());
 		registerArbitrary(TakStone.class, stones());

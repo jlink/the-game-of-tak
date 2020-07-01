@@ -2,16 +2,16 @@ package tak;
 
 import java.util.*;
 
+import tak.testingSupport.*;
+
 import net.jqwik.api.*;
 import net.jqwik.api.Tuple.*;
 import net.jqwik.api.constraints.*;
-import net.jqwik.api.domains.*;
 
-import static tak.TakAssertions.*;
+import static tak.testingSupport.TakAssertions.*;
 import static tak.TakBoard.*;
 
-@Domain(TakDomain.class)
-@Domain(DomainContext.Global.class)
+@TakDomain
 class BoardProperties {
 
 	@Property

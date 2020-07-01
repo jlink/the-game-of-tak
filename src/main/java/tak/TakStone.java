@@ -4,7 +4,7 @@ import java.util.*;
 
 public class TakStone {
 
-	enum Colour {WHITE, BLACK}
+	public enum Colour {WHITE, BLACK}
 
 	enum Shape {NORMAL, CAPSTONE}
 
@@ -34,11 +34,11 @@ public class TakStone {
 
 	public String toPTN() {
 		if (shape == Shape.CAPSTONE) {
-			return "C";
+			return PTN.CAPSTONE;
 		} else if (position == Position.FLAT) {
-			return "F";
+			return PTN.FLAT_STONE;
 		} else {
-			return "S";
+			return PTN.STANDING_STONE;
 		}
 	}
 

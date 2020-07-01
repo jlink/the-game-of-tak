@@ -1,12 +1,12 @@
 package tak;
 
+import tak.testingSupport.*;
+
 import net.jqwik.api.*;
-import net.jqwik.api.domains.*;
 
 import static org.assertj.core.api.Assertions.*;
 
-@Domain(TakDomain.class)
-@Domain(DomainContext.Global.class)
+@TakDomain
 class StoneProperties {
 
 	@Property
@@ -29,6 +29,17 @@ class StoneProperties {
 			assertThatThrownBy(() -> stone.standUp()).isInstanceOf(TakException.class);
 		} else {
 			assertThat(stone.standUp().isStanding()).isTrue();
+		}
+	}
+
+	@Property
+	void ptn(@ForAll TakStone stone) {
+		if (stone.isCapstone()) {
+			assertThat(stone.toPTN()).isEqualTo("C");
+		} else if (stone.isStanding()) {
+			assertThat(stone.toPTN()).isEqualTo("S");
+		} else {
+			assertThat(stone.toPTN()).isEqualTo("F");
 		}
 	}
 
