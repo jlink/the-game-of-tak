@@ -123,6 +123,15 @@ public class TakBoard {
 		return squaresMap;
 	}
 
+	public List<TakSquare> rank(final int rank) {
+		List<TakSquare> rankSquares = new ArrayList<>();
+		int rankIndex = rank - 1;
+		for (int fileIndex = 0; fileIndex < size; fileIndex++) {
+			rankSquares.add(at(new Spot(fileIndex, rankIndex)));
+		}
+		return rankSquares;
+	}
+
 	public TakBoard change(final Map<Spot, Deque<TakStone>> changes) {
 		TakBoard clone = cloneBoard();
 		for (Map.Entry<Spot, Deque<TakStone>> entry : changes.entrySet()) {

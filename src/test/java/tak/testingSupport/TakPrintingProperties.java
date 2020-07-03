@@ -51,10 +51,10 @@ class TakPrintingProperties {
 		List<String> printedSquare = TakPrinter.print(square);
 		if (stack.isEmpty()) {
 			assertThat(printedSquare).hasSize(1);
-			assertThat(printedSquare.get(0)).isEqualTo("|" + EMPTY_SQUARE);
+			assertThat(printedSquare.get(0)).isEqualTo(VERTICAL_BAR + EMPTY_SQUARE);
 		} else {
 			assertThat(printedSquare).hasSize(stack.size());
-			assertThat(printedSquare).allMatch(line -> line.startsWith("|"));
+			assertThat(printedSquare).allMatch(line -> line.startsWith(VERTICAL_BAR));
 		}
 	}
 
@@ -65,41 +65,77 @@ class TakPrintingProperties {
 			rank.add(new TakSquare());
 		}
 
-		List<String> rankLines = TakPrinter.printRank('a', rank);
+		List<String> rankLines = TakPrinter.printRank("1", rank);
 		assertThat(rankLines).hasSize(1);
 
 		String rankString = rankLines.get(0);
 		int expectedLineLength = 1 + boardSize * (1 + EMPTY_SQUARE.length()) + 2;
 		assertThat(rankString).hasSize(expectedLineLength);
-		assertThat(rankString).startsWith("a|");
-		assertThat(rankString).endsWith("|a");
+		assertThat(rankString).startsWith("1" + VERTICAL_BAR);
+		assertThat(rankString).endsWith(VERTICAL_BAR + "1");
 	}
 
 	@Property
-	// @Report(Reporting.GENERATED)
 	void ranks(@ForAll @Size(min = 3, max = 8) List<TakSquare> rank) {
 
-		List<String> rankLines = TakPrinter.printRank('h', rank);
-		for (String rankLine : rankLines) {
-			System.out.println(rankLine);
-		}
+		List<String> rankLines = TakPrinter.printRank("8", rank);
+		printLines(rankLines);
 
 		int expectedLines = Math.max(1, maxStones(rank));
 		assertThat(rankLines).hasSize(expectedLines);
 
-		String firstLine = rankLines.get(0);
-		assertThat(firstLine).startsWith("h|");
-		assertThat(firstLine).endsWith("|h");
+		String lastLine = rankLines.get(rankLines.size() - 1);
+		assertThat(lastLine).startsWith("8" + VERTICAL_BAR);
+		assertThat(lastLine).endsWith(VERTICAL_BAR + "8");
 
-		rankLines.remove(0);
+		rankLines.remove(rankLines.size() - 1);
 		for (String rankLine : rankLines) {
-			assertThat(rankLine).startsWith(" |");
-			assertThat(rankLine).endsWith("| ");
+			assertThat(rankLine).startsWith(" " + VERTICAL_BAR);
+			assertThat(rankLine).endsWith(VERTICAL_BAR + " ");
+		}
+	}
+
+	@Property
+	void emptyBoard(@ForAll TakBoard board) {
+
+		List<String> boardLines = TakPrinter.print(board);
+		// printLines(boardLines);
+
+		assertThat(boardLines).hasSize(1 + board.size() * 2 + 2);
+
+		String firstLine = boardLines.get(0);
+		assertThat(firstLine).startsWith(EMPTY_SQUARE + VERTICAL_BAR);
+		assertThat(firstLine).endsWith(VERTICAL_BAR + EMPTY_SQUARE);
+
+		String lastLine = boardLines.get(boardLines.size() - 1);
+		assertThat(lastLine).startsWith(EMPTY_SQUARE + VERTICAL_BAR);
+		assertThat(lastLine).endsWith(VERTICAL_BAR + EMPTY_SQUARE);
+
+		boardLines.remove(0);
+		boardLines.remove(boardLines.size() - 1);
+
+		for (int i = 0; i < boardLines.size(); i++) {
+			String line = boardLines.get(i);
+			int expectedLineLength = board.size() * 2 + 3;
+			if (i % 2 == 0) {
+				assertThat(line).hasSize(expectedLineLength);
+			} else {
+				assertThat(line).hasSize(expectedLineLength);
+				int rank = board.size() - Math.floorDiv(i , 2);
+				assertThat(line).startsWith(TakPrinter.printRank(rank) + VERTICAL_BAR);
+				assertThat(line).endsWith(VERTICAL_BAR + TakPrinter.printRank(rank));
+			}
 		}
 	}
 
 	private int maxStones(final List<TakSquare> rank) {
 		return rank.stream().mapToInt(square -> square.stack().size()).max().orElse(0);
+	}
+
+	private void printLines(final List<String> lines) {
+		for (String rankLine : lines) {
+			System.out.println(rankLine);
+		}
 	}
 
 }
