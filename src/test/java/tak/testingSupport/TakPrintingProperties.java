@@ -78,20 +78,20 @@ class TakPrintingProperties {
 	@Property
 	void ranks(@ForAll @Size(min = 3, max = 8) List<TakSquare> rank) {
 
-		List<String> rankLines = TakPrinter.printRank("8", rank);
-		printLines(rankLines);
+		List<String> rankLines = TakPrinter.printRank(TakPrinter.printRank(8), rank);
+		// printLines(rankLines);
 
 		int expectedLines = Math.max(1, maxStones(rank));
 		assertThat(rankLines).hasSize(expectedLines);
 
 		String lastLine = rankLines.get(rankLines.size() - 1);
-		assertThat(lastLine).startsWith("8" + VERTICAL_BAR);
-		assertThat(lastLine).endsWith(VERTICAL_BAR + "8");
+		assertThat(lastLine).startsWith(TakPrinter.printRank(8) + VERTICAL_BAR);
+		assertThat(lastLine).endsWith(VERTICAL_BAR + TakPrinter.printRank(8));
 
 		rankLines.remove(rankLines.size() - 1);
 		for (String rankLine : rankLines) {
-			assertThat(rankLine).startsWith(" " + VERTICAL_BAR);
-			assertThat(rankLine).endsWith(VERTICAL_BAR + " ");
+			assertThat(rankLine).startsWith(EMPTY_SQUARE + VERTICAL_BAR);
+			assertThat(rankLine).endsWith(VERTICAL_BAR + EMPTY_SQUARE);
 		}
 	}
 

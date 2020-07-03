@@ -55,7 +55,7 @@ public class TakPrinter {
 				rankSquares.stream().mapToInt(s -> s.stack().size()).max().orElse(0)
 		);
 		for (int i = 0; i < maxStack; i++) {
-			String mark = i == 0 ? rankName : " ";
+			String mark = i == 0 ? rankName : EMPTY_SQUARE;
 			String line = rankLine(mark, rankSquares, i);
 			lines.add(0, line);
 		}
@@ -107,7 +107,7 @@ public class TakPrinter {
 	}
 
 	public static String printFile(final char file) {
-		return codePoint(0x1f130 + (file - 'a'));
+		return codePoint(0x24d0 + (file - 'a'));
 	}
 
 	public static String printRank(final int rank) {
