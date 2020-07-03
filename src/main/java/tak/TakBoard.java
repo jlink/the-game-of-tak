@@ -80,6 +80,10 @@ public class TakBoard {
 		return position;
 	}
 
+	public static Deque<TakStone> stack(TakStone ... stones) {
+		return new ArrayDeque<>(Arrays.asList(stones));
+	}
+
 	public static TakBoard ofSize(final int size) {
 		if (size < MIN_SIZE || size > MAX_SIZE) {
 			throw new IllegalArgumentException(String.format("Size <%s> of Tak board should be between 3 and 8", size));
@@ -164,7 +168,18 @@ public class TakBoard {
 
 	@Override
 	public String toString() {
-		return String.format("TakBoard(%s)", size);
+		Map<Spot, TakSquare> occupiedSquares =
+				squares().entrySet().stream()
+						 .filter(e -> !e.getValue().isEmpty())
+						 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+		String occupiedSquaresString =
+				occupiedSquares.isEmpty() ? "" :
+						"{" +
+								occupiedSquares.entrySet().stream()
+											   .map(e -> e.getKey() + "=" + e.getValue())
+											   .collect(Collectors.joining(", "))
+								+ "}";
+		return String.format("TakBoard(%s)%s", size, occupiedSquaresString);
 	}
 
 	@Override

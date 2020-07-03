@@ -26,6 +26,11 @@ public class TakSquare {
 		return 42;
 	}
 
+	@Override
+	public String toString() {
+		return stack.toString();
+	}
+
 	public boolean isEmpty() {
 		return stack.isEmpty();
 	}
@@ -40,6 +45,6 @@ public class TakSquare {
 	}
 
 	public Optional<TakStone> top() {
-		return Optional.ofNullable(stack.peekLast());
+		return Optional.ofNullable(stack.peekFirst());
 	}
 }

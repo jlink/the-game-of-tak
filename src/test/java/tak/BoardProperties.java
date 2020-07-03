@@ -8,8 +8,9 @@ import net.jqwik.api.*;
 import net.jqwik.api.Tuple.*;
 import net.jqwik.api.constraints.*;
 
-import static tak.testingSupport.TakAssertions.*;
 import static tak.TakBoard.*;
+import static tak.TakStone.Colour.*;
+import static tak.testingSupport.TakAssertions.*;
 
 @TakDomain
 class BoardProperties {
@@ -56,7 +57,7 @@ class BoardProperties {
 		TakBoard emptyBoard = boardAndSpot.get1();
 		Spot spot = boardAndSpot.get2();
 
-		TakStone stone = TakStone.capstone(TakStone.Colour.WHITE);
+		TakStone stone = TakStone.capstone(WHITE);
 		Deque<TakStone> stack = new ArrayDeque<>(List.of(stone));
 		Map<Spot, Deque<TakStone>> changes = Map.of(spot, stack);
 		TakBoard changedBoard = emptyBoard.change(changes);
@@ -67,5 +68,16 @@ class BoardProperties {
 
 		assertThat(emptyBoard).isNotSameAs(changedBoard);
 		assertThat(emptyBoard.at(spot)).isEmpty();
+	}
+
+	@Example
+	void toStringRepresentation(@ForAll TakBoard board) {
+		TakBoard boardWithA1andC3occupied = board.change(Map.of(
+				spot('a', 1), stack(TakStone.capstone(WHITE)),
+				spot('c', 3), stack(TakStone.capstone(BLACK), TakStone.flat(WHITE))
+		));
+
+		assertThat(boardWithA1andC3occupied.toString())
+				.containsSubsequence("a1", "WHITE:C", "c3", "BLACK:C", "WHITE:F");
 	}
 }
