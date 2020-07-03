@@ -20,6 +20,11 @@ public class TakDomainContext extends AbstractDomainContextBase {
 		registerArbitrary(tupleOfBoardAndSpotType(), boardsAndSpots());
 		registerArbitrary(TakStone.class, stones());
 		registerArbitrary(takStack(), stacks());
+		registerArbitrary(TakSquare.class, squares());
+	}
+
+	private Arbitrary<TakSquare> squares() {
+		return stacks().map(TakSquare::new);
 	}
 
 	private TypeUsage takStack() {
