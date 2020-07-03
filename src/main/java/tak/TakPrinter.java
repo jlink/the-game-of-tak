@@ -1,6 +1,7 @@
-package tak.testingSupport;
+package tak;
 
-import tak.*;
+import java.util.*;
+import java.util.stream.*;
 
 public class TakPrinter {
 
@@ -30,5 +31,12 @@ public class TakPrinter {
 			default:
 				throw new IllegalArgumentException();
 		}
+	}
+
+	public static List<String> print(final Deque<TakStone> stack) {
+		if (stack.isEmpty()) {
+			return List.of(" ");
+		}
+		return stack.stream().map(TakPrinter::print).collect(Collectors.toList());
 	}
 }
