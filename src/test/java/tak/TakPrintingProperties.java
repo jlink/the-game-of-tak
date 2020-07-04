@@ -2,10 +2,11 @@ package tak;
 
 import java.util.*;
 
-import net.jqwik.api.*;
-import net.jqwik.api.Tuple.Tuple2;
-import net.jqwik.api.constraints.*;
 import tak.testingSupport.*;
+
+import net.jqwik.api.*;
+import net.jqwik.api.Tuple.*;
+import net.jqwik.api.constraints.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static tak.TakPrinter.*;
@@ -50,10 +51,10 @@ class TakPrintingProperties {
 		List<String> printedSquare = TakPrinter.print(square);
 		if (stack.isEmpty()) {
 			assertThat(printedSquare).hasSize(1);
-			assertThat(printedSquare.get(0)).isEqualTo(VERTICAL_BAR + EMPTY_SQUARE);
+			assertThat(printedSquare.get(0)).isEqualTo(VERTICAL_DIVIDER + EMPTY_SQUARE);
 		} else {
 			assertThat(printedSquare).hasSize(stack.size());
-			assertThat(printedSquare).allMatch(line -> line.startsWith(VERTICAL_BAR));
+			assertThat(printedSquare).allMatch(line -> line.startsWith(VERTICAL_DIVIDER));
 		}
 	}
 
@@ -68,10 +69,10 @@ class TakPrintingProperties {
 		assertThat(rankLines).hasSize(1);
 
 		String rankString = rankLines.get(0);
-		int expectedLineLength = 1 + boardSize * (1 + EMPTY_SQUARE.length()) + 2;
+		int expectedLineLength = boardSize * (1 + VERTICAL_DIVIDER.length()) + 5;
 		assertThat(rankString).hasSize(expectedLineLength);
-		assertThat(rankString).startsWith("1" + VERTICAL_BAR);
-		assertThat(rankString).endsWith(VERTICAL_BAR + "1");
+		assertThat(rankString).startsWith("1" + VERTICAL_DIVIDER);
+		assertThat(rankString).endsWith(VERTICAL_DIVIDER + "1");
 	}
 
 	@Property
@@ -84,8 +85,8 @@ class TakPrintingProperties {
 		assertThat(rankLines).hasSize(expectedLines);
 
 		for (String rankLine : rankLines) {
-			assertThat(rankLine).startsWith(rankName(8) + VERTICAL_BAR);
-			assertThat(rankLine).endsWith(VERTICAL_BAR + rankName(8));
+			assertThat(rankLine).startsWith(rankName(8) + VERTICAL_DIVIDER);
+			assertThat(rankLine).endsWith(VERTICAL_DIVIDER + rankName(8));
 		}
 	}
 
@@ -97,37 +98,50 @@ class TakPrintingProperties {
 
 		assertThat(boardLines).hasSize(1 + board.size() * 2 + 2);
 
-		assertFirstBoardLine(boardLines);
-
-		assertLastBoardLine(boardLines);
-
+		assertFilesLine(boardLines.get(0));
 		boardLines.remove(0);
+		assertFilesLine(boardLines.get(boardLines.size() - 1));
 		boardLines.remove(boardLines.size() - 1);
 
 		for (int i = 0; i < boardLines.size(); i++) {
 			String line = boardLines.get(i);
-			int expectedLineLength = board.size() * 2 + 3;
-			if (i % 2 == 0) {
+			if (i % 2 != 0) {
+				int expectedLineLength = board.size() * (1 + VERTICAL_DIVIDER.length()) + 5;
 				assertThat(line).hasSize(expectedLineLength);
-			} else {
-				assertThat(line).hasSize(expectedLineLength);
-				int rank = board.size() - Math.floorDiv(i , 2);
-				assertThat(line).startsWith(rankName(rank) + VERTICAL_BAR);
-				assertThat(line).endsWith(VERTICAL_BAR + rankName(rank));
+				int rank = board.size() - Math.floorDiv(i, 2);
+				assertThat(line).startsWith(rankName(rank) + VERTICAL_DIVIDER);
+				assertThat(line).endsWith(VERTICAL_DIVIDER + rankName(rank));
 			}
 		}
 	}
 
-	private void assertLastBoardLine(List<String> boardLines) {
-		String lastLine = boardLines.get(boardLines.size() - 1);
-		assertThat(lastLine).startsWith(EMPTY_SQUARE + VERTICAL_BAR);
-		assertThat(lastLine).endsWith(VERTICAL_BAR + EMPTY_SQUARE);
+	@Property(tries = 10)
+	void nonEmptyBoard(@ForAll @Board(empty = false) TakBoard board) {
+
+		List<String> boardLines = TakPrinter.print(board);
+		// printLines(boardLines);
+
+		assertFilesLine(boardLines.get(0));
+		boardLines.remove(0);
+		assertFilesLine(boardLines.get(boardLines.size() - 1));
+		boardLines.remove(boardLines.size() - 1);
+
+		for (String line : boardLines) {
+			if (line.startsWith(HORIZONTAL_DIVIDER)) {
+				int expectedLineLength = board.size() * 2 + 3;
+				assertThat(line).hasSize(expectedLineLength);
+				assertThat(line.toCharArray()).containsOnly(HORIZONTAL_DIVIDER.charAt(0));
+			} else {
+				String rankName = line.substring(0, 1);
+				assertThat(line).startsWith(rankName + VERTICAL_DIVIDER);
+				assertThat(line).endsWith(VERTICAL_DIVIDER + rankName);
+			}
+		}
 	}
 
-	private void assertFirstBoardLine(List<String> boardLines) {
-		String firstLine = boardLines.get(0);
-		assertThat(firstLine).startsWith(EMPTY_SQUARE + VERTICAL_BAR);
-		assertThat(firstLine).endsWith(VERTICAL_BAR + EMPTY_SQUARE);
+	private void assertFilesLine(String lastLine) {
+		assertThat(lastLine).startsWith(EMPTY_SQUARE + VERTICAL_DIVIDER);
+		assertThat(lastLine).endsWith(VERTICAL_DIVIDER + EMPTY_SQUARE);
 	}
 
 	private int maxStones(final List<TakSquare> rank) {
@@ -135,9 +149,12 @@ class TakPrintingProperties {
 	}
 
 	private void printLines(final List<String> lines) {
+		System.out.println();
 		for (String rankLine : lines) {
 			System.out.println(rankLine);
 		}
+		System.out.println();
+		System.out.println("#######################");
 	}
 
 }

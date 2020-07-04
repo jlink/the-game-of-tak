@@ -6,8 +6,8 @@ import java.util.stream.*;
 public class TakPrinter {
 
 	public static final String EMPTY_SQUARE = "\u25a2";
-	public static final String VERTICAL_BAR = " "; //"\uff5c";
-	public static final String HORIZONTAL_BAR = " "; //"\u2015";
+	public static final String VERTICAL_DIVIDER = "   "; //"\uff5c";
+	public static final String HORIZONTAL_DIVIDER = " "; //"\u2015";
 
 	public static String codePoint(int codePoint) {
 		char[] charPair = Character.toChars(codePoint);
@@ -45,7 +45,7 @@ public class TakPrinter {
 	}
 
 	public static List<String> print(final TakSquare square) {
-		return print(square.stack()).stream().map(s -> VERTICAL_BAR + s).collect(Collectors.toList());
+		return print(square.stack()).stream().map(s -> VERTICAL_DIVIDER + s).collect(Collectors.toList());
 	}
 
 	public static List<String> printRank(final String rankName, final List<TakSquare> rankSquares) {
@@ -66,10 +66,10 @@ public class TakPrinter {
 									.map(square -> {
 										List<String> squareLines = print(square);
 										Collections.reverse(squareLines);
-										return index < squareLines.size() ? squareLines.get(index) : VERTICAL_BAR + EMPTY_SQUARE;
+										return index < squareLines.size() ? squareLines.get(index) : VERTICAL_DIVIDER + EMPTY_SQUARE;
 									})
 									.collect(Collectors.joining(""));
-		return String.format("%s%s%s%s", rankName, squares, VERTICAL_BAR, rankName);
+		return String.format("%s%s%s%s", rankName, squares, VERTICAL_DIVIDER, rankName);
 	}
 
 	public static List<String> print(final TakBoard board) {
@@ -94,15 +94,15 @@ public class TakPrinter {
 
 	private static String dividerLine(final int boardSize) {
 		int dividerSize = boardSize * 2 + 3;
-		return IntStream.range(0, dividerSize).mapToObj(i -> HORIZONTAL_BAR).collect(Collectors.joining());
+		return IntStream.range(0, dividerSize).mapToObj(i -> HORIZONTAL_DIVIDER).collect(Collectors.joining());
 	}
 
 	private static String letterLine(final int boardSize) {
 		String numbers = IntStream.range(0, boardSize).mapToObj(i -> {
 			char codePoint = (char) (i + 'a');
-			return fileName(codePoint) + VERTICAL_BAR;
+			return fileName(codePoint) + VERTICAL_DIVIDER;
 		}).collect(Collectors.joining());
-		return String.format(EMPTY_SQUARE + VERTICAL_BAR + "%s" + EMPTY_SQUARE, numbers);
+		return String.format(EMPTY_SQUARE + VERTICAL_DIVIDER + "%s" + EMPTY_SQUARE, numbers);
 	}
 
 	public static String fileName(final char file) {
