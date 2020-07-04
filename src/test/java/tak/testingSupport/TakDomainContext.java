@@ -3,6 +3,7 @@ package tak.testingSupport;
 import java.util.*;
 import java.util.function.*;
 
+import net.jqwik.api.arbitraries.SetArbitrary;
 import tak.*;
 
 import net.jqwik.api.*;
@@ -27,18 +28,43 @@ public class TakDomainContext extends AbstractDomainContextBase {
 		return new ArbitraryProvider() {
 			@Override
 			public boolean canProvideFor(TypeUsage targetType) {
-				Optional<Board> boardAnnotation = targetType.findAnnotation(Board.class);
-				if (boardAnnotation.isEmpty() || !boardAnnotation.get().empty()) {
-					return false;
-				}
 				return targetType.isOfType(TakBoard.class);
 			}
 
 			@Override
 			public Set<Arbitrary<?>> provideFor(TypeUsage targetType, SubtypeProvider subtypeProvider) {
-				return Set.of(newBoards());
+				Optional<Board> boardAnnotation = targetType.findAnnotation(Board.class);
+				if (boardAnnotation.isPresent() && boardAnnotation.get().empty()) {
+					return Set.of(newBoards(boardAnnotation.get().size()));
+				}
+				return Set.of(boards(boardAnnotation.map(Board::size).orElse(0)));
 			}
 		};
+	}
+
+	private Arbitrary<TakBoard> boards(int size) {
+		Arbitrary<TakBoard> emptyBoards = newBoards(size);
+		return emptyBoards.flatMap(
+				board -> {
+					SetArbitrary<TakBoard.Spot> spotsToFill =
+							Arbitraries.of(board.squares().keySet())
+									.unique()
+									.set()
+									.ofMinSize(1)
+									.ofMaxSize(board.size() * board.size() - 3);
+					return spotsToFill.flatMap(spots -> {
+						return stacks()
+								.filter(stack -> stack.size() > 1)
+								.map(stack -> {
+									Map<TakBoard.Spot, Deque<TakStone>> changes = new HashMap<>();
+									for (TakBoard.Spot spot : spots) {
+										changes.put(spot, stack);
+									}
+									return board.change(changes);
+								});
+					});
+				}
+		);
 	}
 
 	private Arbitrary<TakSquare> squares() {
@@ -54,9 +80,9 @@ public class TakDomainContext extends AbstractDomainContextBase {
 
 	private Arbitrary<Deque<TakStone>> stacks() {
 		return stones().list().ofMaxSize(10)
-					   .filter(list -> count(list, capstone(WHITE)) <= 1)
-					   .filter(list -> count(list, capstone(BLACK)) <= 1)
-					   .map(c -> (Deque<TakStone>) new ArrayDeque<TakStone>(c))
+				.filter(list -> count(list, capstone(WHITE)) <= 1)
+				.filter(list -> count(list, capstone(BLACK)) <= 1)
+				.map(c -> (Deque<TakStone>) new ArrayDeque<>(c))
 					   .filter(stack -> !isBelowTop(stack, TakStone::isStanding));
 	}
 
@@ -87,7 +113,7 @@ public class TakDomainContext extends AbstractDomainContextBase {
 	}
 
 	private Arbitrary<Tuple2<TakBoard, TakBoard.Spot>> boardsAndSpots() {
-		Arbitrary<TakBoard> boards = newBoards();
+		Arbitrary<TakBoard> boards = newBoards(0);
 		return boards.flatMap(board -> {
 			Arbitrary<TakBoard.Spot> spots = Arbitraries.of(board.squares().keySet());
 			return spots.map(spot -> Tuple.of(board, spot));
@@ -102,9 +128,11 @@ public class TakDomainContext extends AbstractDomainContextBase {
 		);
 	}
 
-	private Arbitrary<TakBoard> newBoards() {
+	private Arbitrary<TakBoard> newBoards(int size) {
+		int actualMinSize = size == 0 ? TakBoard.MIN_SIZE : size;
+		int actualMaxSize = size == 0 ? TakBoard.MAX_SIZE : size;
 		return Arbitraries
-					   .integers().between(TakBoard.MIN_SIZE, TakBoard.MAX_SIZE)
-					   .map(TakBoard::ofSize);
+				.integers().between(actualMinSize, actualMaxSize)
+				.map(TakBoard::ofSize);
 	}
 }

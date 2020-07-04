@@ -6,4 +6,5 @@ import java.lang.annotation.*;
 @Target({ElementType.PARAMETER, ElementType.TYPE_USE})
 public @interface Board {
 	boolean empty() default false;
+	int size() default 0;
 }

@@ -8,7 +8,7 @@ import tak.TakBoard.*;
 import net.jqwik.api.*;
 import net.jqwik.api.Tuple.*;
 
-import static org.assertj.core.api.Assertions.*;
+import static tak.testingSupport.TakAssertions.*;
 
 @TakDomain
 class TakDomainProperties {
@@ -47,4 +47,19 @@ class TakDomainProperties {
 	}
 
 
+	@Property(tries =  10)
+	void emptyBoards(@ForAll @Board(empty = true) TakBoard board) {
+		assertThat(board).isEmpty();
+	}
+
+	@Property(tries =  10)
+	void boardsWithStones(@ForAll TakBoard board) {
+//		List<String> lines = TakPrinter.print(board);
+//		lines.forEach(System.out::println);
+//		System.out.println();
+//		System.out.println("############################");
+//		System.out.println();
+
+		assertThat(board).isNotEmpty();
+	}
 }
