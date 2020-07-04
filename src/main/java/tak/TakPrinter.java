@@ -55,8 +55,7 @@ public class TakPrinter {
 				rankSquares.stream().mapToInt(s -> s.stack().size()).max().orElse(0)
 		);
 		for (int i = 0; i < maxStack; i++) {
-			String mark = i == 0 ? rankName : EMPTY_SQUARE;
-			String line = rankLine(mark, rankSquares, i);
+			String line = rankLine(rankName, rankSquares, i);
 			lines.add(0, line);
 		}
 		return lines;
@@ -81,7 +80,7 @@ public class TakPrinter {
 		for (int rank = board.size(); rank > 0; rank--) {
 			lines.add(dividerLine);
 			List<TakSquare> rankSquares = board.rank(rank);
-			List<String> rankLines = rankLines(printRank(rank), rankSquares);
+			List<String> rankLines = rankLines(rankName(rank), rankSquares);
 			lines.addAll(rankLines);
 		}
 		lines.add(dividerLine);
@@ -101,16 +100,16 @@ public class TakPrinter {
 	private static String letterLine(final int boardSize) {
 		String numbers = IntStream.range(0, boardSize).mapToObj(i -> {
 			char codePoint = (char) (i + 'a');
-			return printFile(codePoint) + VERTICAL_BAR;
+			return fileName(codePoint) + VERTICAL_BAR;
 		}).collect(Collectors.joining());
 		return String.format(EMPTY_SQUARE + VERTICAL_BAR + "%s" + EMPTY_SQUARE, numbers);
 	}
 
-	public static String printFile(final char file) {
+	public static String fileName(final char file) {
 		return codePoint(0x24d0 + (file - 'a'));
 	}
 
-	public static String printRank(final int rank) {
+	public static String rankName(final int rank) {
 		return codePoint(0x245f + rank);
 	}
 

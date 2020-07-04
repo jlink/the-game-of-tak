@@ -54,11 +54,11 @@ class TakDomainProperties {
 
 	@Property(tries =  10)
 	void boardsWithStones(@ForAll TakBoard board) {
-//		List<String> lines = TakPrinter.print(board);
-//		lines.forEach(System.out::println);
-//		System.out.println();
-//		System.out.println("############################");
-//		System.out.println();
+		// List<String> lines = TakPrinter.print(board);
+		// lines.forEach(System.out::println);
+		// System.out.println();
+		// System.out.println("############################");
+		// System.out.println();
 
 		assertThat(board).isNotEmpty();
 	}

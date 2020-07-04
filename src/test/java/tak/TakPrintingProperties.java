@@ -64,7 +64,7 @@ class TakPrintingProperties {
 			rank.add(new TakSquare());
 		}
 
-		List<String> rankLines = TakPrinter.printRank("1", rank);
+		List<String> rankLines = printRank("1", rank);
 		assertThat(rankLines).hasSize(1);
 
 		String rankString = rankLines.get(0);
@@ -77,20 +77,15 @@ class TakPrintingProperties {
 	@Property
 	void ranks(@ForAll @Size(min = 3, max = 8) List<TakSquare> rank) {
 
-		List<String> rankLines = TakPrinter.printRank(TakPrinter.printRank(8), rank);
+		List<String> rankLines = printRank(rankName(8), rank);
 		// printLines(rankLines);
 
 		int expectedLines = Math.max(1, maxStones(rank));
 		assertThat(rankLines).hasSize(expectedLines);
 
-		String lastLine = rankLines.get(rankLines.size() - 1);
-		assertThat(lastLine).startsWith(TakPrinter.printRank(8) + VERTICAL_BAR);
-		assertThat(lastLine).endsWith(VERTICAL_BAR + TakPrinter.printRank(8));
-
-		rankLines.remove(rankLines.size() - 1);
 		for (String rankLine : rankLines) {
-			assertThat(rankLine).startsWith(EMPTY_SQUARE + VERTICAL_BAR);
-			assertThat(rankLine).endsWith(VERTICAL_BAR + EMPTY_SQUARE);
+			assertThat(rankLine).startsWith(rankName(8) + VERTICAL_BAR);
+			assertThat(rankLine).endsWith(VERTICAL_BAR + rankName(8));
 		}
 	}
 
@@ -117,8 +112,8 @@ class TakPrintingProperties {
 			} else {
 				assertThat(line).hasSize(expectedLineLength);
 				int rank = board.size() - Math.floorDiv(i , 2);
-				assertThat(line).startsWith(TakPrinter.printRank(rank) + VERTICAL_BAR);
-				assertThat(line).endsWith(VERTICAL_BAR + TakPrinter.printRank(rank));
+				assertThat(line).startsWith(rankName(rank) + VERTICAL_BAR);
+				assertThat(line).endsWith(VERTICAL_BAR + rankName(rank));
 			}
 		}
 	}
