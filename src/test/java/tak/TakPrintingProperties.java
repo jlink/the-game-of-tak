@@ -1,12 +1,11 @@
-package tak.testingSupport;
+package tak;
 
 import java.util.*;
 
-import tak.*;
-
 import net.jqwik.api.*;
-import net.jqwik.api.Tuple.*;
+import net.jqwik.api.Tuple.Tuple2;
 import net.jqwik.api.constraints.*;
+import tak.testingSupport.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static tak.TakPrinter.*;
@@ -96,20 +95,16 @@ class TakPrintingProperties {
 	}
 
 	@Property
-	void emptyBoard(@ForAll TakBoard board) {
+	void emptyBoard(@ForAll @Board(empty = true) TakBoard board) {
 
 		List<String> boardLines = TakPrinter.print(board);
 		// printLines(boardLines);
 
 		assertThat(boardLines).hasSize(1 + board.size() * 2 + 2);
 
-		String firstLine = boardLines.get(0);
-		assertThat(firstLine).startsWith(EMPTY_SQUARE + VERTICAL_BAR);
-		assertThat(firstLine).endsWith(VERTICAL_BAR + EMPTY_SQUARE);
+		assertFirstBoardLine(boardLines);
 
-		String lastLine = boardLines.get(boardLines.size() - 1);
-		assertThat(lastLine).startsWith(EMPTY_SQUARE + VERTICAL_BAR);
-		assertThat(lastLine).endsWith(VERTICAL_BAR + EMPTY_SQUARE);
+		assertLastBoardLine(boardLines);
 
 		boardLines.remove(0);
 		boardLines.remove(boardLines.size() - 1);
@@ -126,6 +121,18 @@ class TakPrintingProperties {
 				assertThat(line).endsWith(VERTICAL_BAR + TakPrinter.printRank(rank));
 			}
 		}
+	}
+
+	private void assertLastBoardLine(List<String> boardLines) {
+		String lastLine = boardLines.get(boardLines.size() - 1);
+		assertThat(lastLine).startsWith(EMPTY_SQUARE + VERTICAL_BAR);
+		assertThat(lastLine).endsWith(VERTICAL_BAR + EMPTY_SQUARE);
+	}
+
+	private void assertFirstBoardLine(List<String> boardLines) {
+		String firstLine = boardLines.get(0);
+		assertThat(firstLine).startsWith(EMPTY_SQUARE + VERTICAL_BAR);
+		assertThat(firstLine).endsWith(VERTICAL_BAR + EMPTY_SQUARE);
 	}
 
 	private int maxStones(final List<TakSquare> rank) {

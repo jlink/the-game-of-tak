@@ -34,7 +34,7 @@ class BoardProperties {
 	}
 
 	@Property
-	void newBoard(@ForAll TakBoard board) {
+	void newBoard(@ForAll @Board(empty = true) TakBoard board) {
 		assertThat(board.size()).isBetween(3, 8);
 
 		assertThat(board.squares()).hasSize(board.size() * board.size());
@@ -53,7 +53,7 @@ class BoardProperties {
 	}
 
 	@Property
-	void canSetStackOnAnySquare(@ForAll Tuple2<TakBoard, Spot> boardAndSpot) {
+	void canSetStackOnAnySquare(@ForAll Tuple2<@Board(empty = true) TakBoard, Spot> boardAndSpot) {
 		TakBoard emptyBoard = boardAndSpot.get1();
 		Spot spot = boardAndSpot.get2();
 
@@ -71,7 +71,7 @@ class BoardProperties {
 	}
 
 	@Example
-	void toStringRepresentation(@ForAll TakBoard board) {
+	void toStringRepresentation(@ForAll @Board(empty = true) TakBoard board) {
 		TakBoard boardWithA1andC3occupied = board.change(Map.of(
 				spot('a', 1), stack(TakStone.capstone(WHITE)),
 				spot('c', 3), stack(TakStone.capstone(BLACK), TakStone.flat(WHITE))

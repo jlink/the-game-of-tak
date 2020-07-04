@@ -16,11 +16,29 @@ import static tak.TakStone.*;
 public class TakDomainContext extends AbstractDomainContextBase {
 
 	public TakDomainContext() {
-		registerArbitrary(TakBoard.class, newBoards());
+		registerProvider(emptyBoardProvider());
 		registerArbitrary(tupleOfBoardAndSpotType(), boardsAndSpots());
 		registerArbitrary(TakStone.class, stones());
 		registerArbitrary(takStack(), stacks());
 		registerArbitrary(TakSquare.class, squares());
+	}
+
+	private ArbitraryProvider emptyBoardProvider() {
+		return new ArbitraryProvider() {
+			@Override
+			public boolean canProvideFor(TypeUsage targetType) {
+				Optional<Board> boardAnnotation = targetType.findAnnotation(Board.class);
+				if (boardAnnotation.isEmpty() || !boardAnnotation.get().empty()) {
+					return false;
+				}
+				return targetType.isOfType(TakBoard.class);
+			}
+
+			@Override
+			public Set<Arbitrary<?>> provideFor(TypeUsage targetType, SubtypeProvider subtypeProvider) {
+				return Set.of(newBoards());
+			}
+		};
 	}
 
 	private Arbitrary<TakSquare> squares() {
