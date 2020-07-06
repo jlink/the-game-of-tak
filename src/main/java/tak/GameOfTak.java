@@ -21,8 +21,8 @@ public class GameOfTak {
 	}
 
 	private final int size;
-	private final TakPosition position;
 	private final List<TakMove> moves = new ArrayList<>();
+	private TakPosition position;
 	private Status status;
 
 	public GameOfTak(final int size) {
@@ -99,6 +99,9 @@ public class GameOfTak {
 	}
 
 	public void makeMove(final TakMove move) {
-
+		TakMove.Result result = move.execute(position, status);
+		status = result.status();
+		position = result.position();
+		moves.add(move);
 	}
 }

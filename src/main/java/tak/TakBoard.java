@@ -65,6 +65,10 @@ public class TakBoard {
 		private int rankIndex() {
 			return rank - 1;
 		}
+
+		public String toPTN() {
+			return toString();
+		}
 	}
 
 	public static Spot spot(final char file, final int rank) {
