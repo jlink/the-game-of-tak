@@ -3,12 +3,26 @@ package tak;
 import java.util.*;
 
 public class GameOfTak {
+	public enum Status {
+		PRELUDE_WHITE {
+			@Override
+			TakPlayer nextToMove() {
+				return TakPlayer.WHITE;
+			}
+		};
+
+		abstract TakPlayer nextToMove();
+	}
+
 	private final int size;
 	private final TakPosition position;
+	private final List<TakMove> moves = new ArrayList<>();
+	private Status status;
 
 	public GameOfTak(final int size) {
 		this.size = size;
 		this.position = createStartingPosition(size);
+		this.status = Status.PRELUDE_WHITE;
 	}
 
 	private TakPosition createStartingPosition(final int size) {
@@ -68,5 +82,13 @@ public class GameOfTak {
 
 	public TakPosition position() {
 		return position;
+	}
+
+	public List<TakMove> moves() {
+		return moves;
+	}
+
+	public Status status() {
+		return status;
 	}
 }

@@ -15,10 +15,13 @@ class GameProperties {
 	void new_game_in_all_possible_sizes(@ForAll @IntRange(min = 3, max = 8) int size) {
 		GameOfTak game = new GameOfTak(size);
 		assertThat(game.size()).isEqualTo(size);
+		assertThat(game.moves()).isEmpty();
+		assertThat(game.status()).isEqualTo(GameOfTak.Status.PRELUDE_WHITE);
 
 		TakPosition startingPosition = game.position();
 		assertThat(startingPosition.board()).isEqualTo(TakBoard.ofSize(size));
 		assertThat(startingPosition.nextToMove()).isEqualTo(TakPlayer.WHITE);
+
 		assertThat(startingPosition.inventory(TakPlayer.WHITE)).isNotEmpty();
 		assertThat(startingPosition.inventory(TakPlayer.BLACK)).isNotEmpty();
 	}
