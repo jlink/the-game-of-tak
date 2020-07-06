@@ -18,7 +18,7 @@ public class TakPrinter {
 		switch (stone.colour()) {
 			case WHITE:
 				if (stone.isCapstone()) {
-					return codePoint(0x1F132);
+					return codePoint(0x24b8);
 				} else if (stone.isStanding()) {
 					return codePoint(0x1F142);
 				} else {
@@ -26,7 +26,7 @@ public class TakPrinter {
 				}
 			case BLACK:
 				if (stone.isCapstone()) {
-					return codePoint(0x1F172);
+					return codePoint(0x1F152);
 				} else if (stone.isStanding()) {
 					return codePoint(0x1F182);
 				} else {

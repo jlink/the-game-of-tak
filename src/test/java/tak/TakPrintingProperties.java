@@ -25,8 +25,8 @@ class TakPrintingProperties {
 	@Data
 	List<Tuple2<TakStone, String>> stonesWithPrintString() {
 		return List.of(
-				Tuple.of(TakStone.capstone(WHITE), TakPrinter.codePoint(0x1F132)), //🄲
-				Tuple.of(TakStone.capstone(BLACK), TakPrinter.codePoint(0x1F172)), //🅲
+				Tuple.of(TakStone.capstone(WHITE), TakPrinter.codePoint(0x24b8)), //Ⓒ
+				Tuple.of(TakStone.capstone(BLACK), TakPrinter.codePoint(0x1F152)), //🅒
 				Tuple.of(TakStone.flat(WHITE), TakPrinter.codePoint(0x1F135)), //🄵
 				Tuple.of(TakStone.flat(BLACK), TakPrinter.codePoint(0x1F175)), //🅵
 				Tuple.of(TakStone.flat(WHITE).standUp(), TakPrinter.codePoint(0x1F142)), //🅂
