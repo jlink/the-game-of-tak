@@ -1,7 +1,8 @@
 package tak;
 
 import java.util.*;
-import java.util.function.*;
+
+import tak.testingSupport.*;
 
 import net.jqwik.api.*;
 import net.jqwik.api.constraints.*;
@@ -37,10 +38,10 @@ class GameProperties {
 		assertThat(whiteInventory).allMatch(stone -> stone.colour() == TakStone.Colour.WHITE);
 		assertThat(blackInventory).allMatch(stone -> stone.colour() == TakStone.Colour.BLACK);
 
-		assertThat(countStones(whiteInventory, s -> !s.isCapstone())).isEqualTo(expectedFlats);
-		assertThat(countStones(whiteInventory, TakStone::isCapstone)).isEqualTo(expectedCaps);
-		assertThat(countStones(blackInventory, s -> !s.isCapstone())).isEqualTo(expectedFlats);
-		assertThat(countStones(blackInventory, TakStone::isCapstone)).isEqualTo(expectedCaps);
+		assertThat(TakTestingSupport.count(whiteInventory, s -> !s.isCapstone())).isEqualTo(expectedFlats);
+		assertThat(TakTestingSupport.count(whiteInventory, TakStone::isCapstone)).isEqualTo(expectedCaps);
+		assertThat(TakTestingSupport.count(blackInventory, s -> !s.isCapstone())).isEqualTo(expectedFlats);
+		assertThat(TakTestingSupport.count(blackInventory, TakStone::isCapstone)).isEqualTo(expectedCaps);
 	}
 
 	@Data
@@ -53,10 +54,6 @@ class GameProperties {
 				Tuple.of(7, 40, 2),
 				Tuple.of(8, 50, 2)
 		);
-	}
-
-	private int countStones(List<TakStone> inventory, Predicate<TakStone> condition) {
-		return (int) inventory.stream().filter(condition).count();
 	}
 
 }

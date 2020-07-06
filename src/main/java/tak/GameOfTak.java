@@ -9,6 +9,12 @@ public class GameOfTak {
 			TakPlayer nextToMove() {
 				return TakPlayer.WHITE;
 			}
+		},
+		PRELUDE_BLACK {
+			@Override
+			TakPlayer nextToMove() {
+				return TakPlayer.BLACK;
+			}
 		};
 
 		abstract TakPlayer nextToMove();
@@ -90,5 +96,9 @@ public class GameOfTak {
 
 	public Status status() {
 		return status;
+	}
+
+	public void makeMove(final TakMove move) {
+
 	}
 }
