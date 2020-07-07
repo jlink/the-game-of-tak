@@ -19,10 +19,21 @@ public class TakDomainContext extends AbstractDomainContextBase {
 	public TakDomainContext() {
 		registerProvider(gamesProvider());
 		registerProvider(emptyBoardProvider());
-		registerArbitrary(tupleOfBoardAndSpotType(), boardsAndSpots());
+		registerArbitrary(tupleOfBoardAndSpotType(), boardAndSpot());
+		registerArbitrary(tupleOfGameAndSpotListType(), gameAndSpots());
 		registerArbitrary(TakStone.class, stones());
 		registerArbitrary(takStack(), stacks());
 		registerArbitrary(TakSquare.class, squares());
+	}
+
+	private Arbitrary<Tuple2<GameOfTak, List<TakBoard.Spot>>> gameAndSpots() {
+		return gameSize(GameOfTak.MIN_SIZE, GameOfTak.MAX_SIZE)
+					   .flatMap(size -> {
+						   GameOfTak game = new GameOfTak(size);
+						   Arbitrary<TakBoard.Spot> spot = Arbitraries.of(game.position().board().squares().keySet()).unique();
+						   return spot.list().ofMinSize(3).ofMaxSize(size * size - 3)
+									  .map(spots -> Tuple.of(game, spots));
+					   });
 	}
 
 	private ArbitraryProvider gamesProvider() {
@@ -36,12 +47,15 @@ public class TakDomainContext extends AbstractDomainContextBase {
 			public Set<Arbitrary<?>> provideFor(final TypeUsage targetType, final SubtypeProvider subtypeProvider) {
 				Optional<Game> gameAnnotation = targetType.findAnnotation(Game.class);
 				if (gameAnnotation.isPresent() && gameAnnotation.get().isNew()) {
-					return Set.of(gameSize(targetType).map(GameOfTak::new));
+					return Set.of(newGame(targetType));
 				}
-
 				return Set.of();
 			}
 		};
+	}
+
+	private Arbitrary<GameOfTak> newGame(final TypeUsage targetType) {
+		return gameSize(targetType).map(GameOfTak::new);
 	}
 
 	private ArbitraryProvider emptyBoardProvider() {
@@ -67,7 +81,11 @@ public class TakDomainContext extends AbstractDomainContextBase {
 		int gameSize = sizeAnnotation.map(GameSize::value).orElse(0);
 		int actualMinSize = gameSize == 0 ? GameOfTak.MIN_SIZE : gameSize;
 		int actualMaxSize = gameSize == 0 ? GameOfTak.MAX_SIZE : gameSize;
-		return Arbitraries.integers().between(actualMinSize, actualMaxSize);
+		return TakDomainContext.this.gameSize(actualMinSize, actualMaxSize);
+	}
+
+	private Arbitrary<Integer> gameSize(final int minSize, final int maxSize) {
+		return Arbitraries.integers().between(minSize, maxSize);
 	}
 
 	private Arbitrary<TakBoard> boards(int size) {
@@ -140,7 +158,7 @@ public class TakDomainContext extends AbstractDomainContextBase {
 		);
 	}
 
-	private Arbitrary<Tuple2<TakBoard, TakBoard.Spot>> boardsAndSpots() {
+	private Arbitrary<Tuple2<TakBoard, TakBoard.Spot>> boardAndSpot() {
 		Arbitrary<TakBoard> boards = newBoards(0);
 		return boards.flatMap(board -> {
 			Arbitrary<TakBoard.Spot> spots = Arbitraries.of(board.squares().keySet());
@@ -156,11 +174,20 @@ public class TakDomainContext extends AbstractDomainContextBase {
 		);
 	}
 
+	private TypeUsage tupleOfGameAndSpotListType() {
+		return TypeUsage.of(
+				Tuple2.class,
+				TypeUsage.of(GameOfTak.class),
+				TypeUsage.of(
+						List.class,
+						TypeUsage.of(TakBoard.Spot.class)
+				)
+		);
+	}
+
 	private Arbitrary<TakBoard> newBoards(int size) {
 		int actualMinSize = size == 0 ? GameOfTak.MIN_SIZE : size;
 		int actualMaxSize = size == 0 ? GameOfTak.MAX_SIZE : size;
-		return Arbitraries
-					   .integers().between(actualMinSize, actualMaxSize)
-					   .map(TakBoard::ofSize);
+		return gameSize(actualMinSize, actualMaxSize).map(TakBoard::ofSize);
 	}
 }

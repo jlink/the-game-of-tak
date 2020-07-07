@@ -2,6 +2,8 @@ package tak;
 
 import java.util.*;
 
+import tak.GameOfTak.*;
+
 class PlacingMove extends TakMove {
 
 	private final TakStone stone;
@@ -18,21 +20,29 @@ class PlacingMove extends TakMove {
 	}
 
 	@Override
-	public Result execute(final TakPosition beforePosition, final GameOfTak.Status beforeStatus) {
+	public Result execute(final TakPosition beforePosition, final Status beforeStatus) {
+		if (beforePosition.board().at(spot).isOccupied()) {
+			String message = String.format("Stone cannot be placed on occupied spot %s", spot);
+			throw new TakException(message);
+		}
 		TakPosition newPosition = changePosition(beforePosition, player.opponent(), beforeStatus);
-		GameOfTak.Status nextStatus = nextStatus(beforeStatus);
+		Status nextStatus = nextStatus(beforeStatus);
 		return new Result(newPosition, nextStatus);
 	}
 
-	private GameOfTak.Status nextStatus(final GameOfTak.Status beforeStatus) {
+	private Status nextStatus(final Status beforeStatus) {
 		return switch (beforeStatus) {
-			case PRELUDE_WHITE -> GameOfTak.Status.PRELUDE_BLACK;
-			case PRELUDE_BLACK -> GameOfTak.Status.WHITE_TO_MOVE;
-			default -> GameOfTak.Status.WHITE_TO_MOVE;
+			case PRELUDE_WHITE -> Status.PRELUDE_BLACK;
+			case PRELUDE_BLACK -> Status.ONGOING;
+			case ONGOING -> Status.ONGOING;
+			case FINISHED -> {
+				String message = "Game already finished";
+				throw new TakException(message);
+			}
 		};
 	}
 
-	private TakPosition changePosition(final TakPosition beforePosition, final TakPlayer nextToMove, GameOfTak.Status currentStatus) {
+	private TakPosition changePosition(final TakPosition beforePosition, final TakPlayer nextToMove, Status currentStatus) {
 		if (currentStatus.isPrelude() && stone.isStanding()) {
 			String message = String.format("Only flat stones can be set in prelude. Stone %s is not flat.", stone);
 			throw new TakException(message);
@@ -43,7 +53,7 @@ class PlacingMove extends TakMove {
 		return new TakPosition(newBoard, nextToMove, newInventory);
 	}
 
-	private void removeStone(final Map<TakPlayer, List<TakStone>> newInventory, final GameOfTak.Status currentStatus) {
+	private void removeStone(final Map<TakPlayer, List<TakStone>> newInventory, final Status currentStatus) {
 		TakPlayer effectedPlayer = currentStatus.isPrelude() ? this.player.opponent() : this.player;
 		if (!newInventory.get(effectedPlayer).remove(stone)) {
 			String message = String.format("Player %s does not have stone %s available", effectedPlayer, stone);

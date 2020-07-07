@@ -19,7 +19,8 @@ public class GameOfTak {
 				return true;
 			}
 		},
-		WHITE_TO_MOVE;
+		ONGOING,
+		FINISHED;
 
 		public boolean isPrelude() {
 			return false;
@@ -109,5 +110,10 @@ public class GameOfTak {
 		status = result.status();
 		position = result.position();
 		moves.add(move);
+	}
+
+	@Override
+	public String toString() {
+		return String.format("GameOfTak(%s):%s", size, moves);
 	}
 }

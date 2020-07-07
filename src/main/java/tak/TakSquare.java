@@ -35,6 +35,10 @@ public class TakSquare {
 		return stack.isEmpty();
 	}
 
+	public boolean isOccupied() {
+		return !isEmpty();
+	}
+
 	public TakSquare set(final Deque<TakStone> stack) {
 		return new TakSquare(stack);
 	}
@@ -47,4 +51,5 @@ public class TakSquare {
 	public Optional<TakStone> top() {
 		return Optional.ofNullable(stack.peekFirst());
 	}
+
 }

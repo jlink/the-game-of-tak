@@ -1,5 +1,7 @@
 package tak;
 
+import java.util.*;
+
 import tak.testingSupport.*;
 
 import net.jqwik.api.*;
@@ -51,7 +53,7 @@ class MovingProperties {
 			game.makeMove(placeOnC3);
 
 			assertThat(game.moves()).containsExactly(placeOnA1, placeOnC3);
-			assertThat(game.status()).isEqualTo(GameOfTak.Status.WHITE_TO_MOVE);
+			assertThat(game.status()).isEqualTo(GameOfTak.Status.ONGOING);
 
 			TakPosition position = game.position();
 			assertThat(position.board().at(TakBoard.spot('c', 3))).hasStack(stoneToPlace);
@@ -74,6 +76,57 @@ class MovingProperties {
 					TakBoard.spot('a', 1)
 			);
 			assertThatThrownBy(() -> game.makeMove(placeStandingStone)).isInstanceOf(TakException.class);
+
+			assertThat(game.moves()).hasSize(0);
+		}
+
+		@Property
+		void cannotPlaceOnOccupiedSpot(@ForAll @Game(isNew = true) GameOfTak game) {
+			TakMove placeFirst = TakMove.place(
+					TakPlayer.WHITE,
+					TakStone.flat(TakStone.Colour.BLACK),
+					TakBoard.spot('a', 1)
+			);
+			game.makeMove(placeFirst);
+
+			TakMove placeOnSameSpot = TakMove.place(
+					TakPlayer.BLACK,
+					TakStone.flat(TakStone.Colour.WHITE),
+					TakBoard.spot('a', 1)
+			);
+
+			assertThatThrownBy(() -> game.makeMove(placeOnSameSpot)).isInstanceOf(TakException.class);
+
+			assertThat(game.moves()).hasSize(1);
+
+		}
+	}
+
+	@Group
+	class StandardPlacings {
+
+		@Property
+		void takingTurns(@ForAll Tuple.Tuple2<@Game(isNew = true) GameOfTak, List<TakBoard.Spot>> gameAndSpots) {
+			GameOfTak game = gameAndSpots.get1();
+			List<TakBoard.Spot> originalSpots = gameAndSpots.get2();
+			ArrayList<TakBoard.Spot> spots = new ArrayList<>(originalSpots);
+			playPrelude(game, spots.remove(0), spots.remove(0));
+
+			for (TakBoard.Spot spot : spots) {
+				TakPlayer player = game.position().nextToMove();
+				TakMove move = TakMove.place(player, TakStone.flat(player.stoneColour()), spot);
+				game.makeMove(move);
+				assertThat(game.status()).isEqualTo(GameOfTak.Status.ONGOING);
+			}
+
+			assertThat(game.moves()).hasSize(originalSpots.size());
+		}
+
+		private void playPrelude(final GameOfTak game, final TakBoard.Spot first, final TakBoard.Spot second) {
+			TakMove whitePrelude = TakMove.place(TakPlayer.WHITE, TakStone.flat(TakStone.Colour.BLACK), first);
+			TakMove blackPrelude = TakMove.place(TakPlayer.BLACK, TakStone.flat(TakStone.Colour.WHITE), second);
+			game.makeMove(whitePrelude);
+			game.makeMove(blackPrelude);
 		}
 	}
 
@@ -87,6 +140,8 @@ class MovingProperties {
 				TakBoard.spot('a', 1)
 		);
 		assertThatThrownBy(() -> game.makeMove(wrongPlayerMove)).isInstanceOf(TakException.class);
+
+		assertThat(game.moves()).hasSize(0);
 	}
 
 	private int countInventoryFlats(final TakPosition position, final TakPlayer player) {
