@@ -33,6 +33,10 @@ class PlacingMove extends TakMove {
 	}
 
 	private TakPosition changePosition(final TakPosition beforePosition, final TakPlayer nextToMove, GameOfTak.Status currentStatus) {
+		if (currentStatus.isPrelude() && stone.isStanding()) {
+			String message = String.format("Only flat stones can be set in prelude. Stone %s is not flat.", stone);
+			throw new TakException(message);
+		}
 		Map<TakPlayer, List<TakStone>> newInventory = Map.copyOf(beforePosition.inventory());
 		removeStone(newInventory, currentStatus);
 		TakBoard newBoard = beforePosition.board().change(Map.of(spot, TakBoard.stack(stone)));

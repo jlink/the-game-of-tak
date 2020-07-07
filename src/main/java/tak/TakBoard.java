@@ -5,17 +5,14 @@ import java.util.stream.*;
 
 public class TakBoard {
 
-	public static final int MIN_SIZE = 3;
-	public static final int MAX_SIZE = 8;
-
 	public static class Spot {
 
 		public static List<Character> files() {
-			return IntStream.range(0, MAX_SIZE).mapToObj(Spot::file).collect(Collectors.toList());
+			return IntStream.range(0, GameOfTak.MAX_SIZE).mapToObj(Spot::file).collect(Collectors.toList());
 		}
 
 		public static List<Integer> ranks() {
-			return IntStream.range(0, MAX_SIZE).mapToObj(Spot::rank).collect(Collectors.toList());
+			return IntStream.range(0, GameOfTak.MAX_SIZE).mapToObj(Spot::rank).collect(Collectors.toList());
 		}
 
 		private static char file(final int index) {
@@ -89,7 +86,7 @@ public class TakBoard {
 	}
 
 	public static TakBoard ofSize(final int size) {
-		if (size < MIN_SIZE || size > MAX_SIZE) {
+		if (size < GameOfTak.MIN_SIZE || size > GameOfTak.MAX_SIZE) {
 			throw new IllegalArgumentException(String.format("Size <%s> of Tak board should be between 3 and 8", size));
 		}
 		TakSquare[] squares = initSquares(size);

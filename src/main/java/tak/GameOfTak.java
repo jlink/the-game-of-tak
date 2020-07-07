@@ -3,6 +3,9 @@ package tak;
 import java.util.*;
 
 public class GameOfTak {
+	public static final int MIN_SIZE = 3;
+	public static final int MAX_SIZE = 8;
+
 	public enum Status {
 		PRELUDE_WHITE {
 			@Override
