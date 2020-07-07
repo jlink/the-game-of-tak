@@ -22,8 +22,12 @@ public class TakPosition {
 		return board;
 	}
 
-	public List<TakStone> inventory(final TakPlayer player) {
-		return inventory.get(player);
+	public List<TakStone> playerInventory(final TakPlayer player) {
+		return Collections.unmodifiableList(inventory.get(player));
+	}
+
+	public Map<TakPlayer, List<TakStone>> inventory() {
+		return Collections.unmodifiableMap(inventory);
 	}
 
 	public TakPlayer nextToMove() {

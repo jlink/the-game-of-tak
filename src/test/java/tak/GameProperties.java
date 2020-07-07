@@ -23,8 +23,8 @@ class GameProperties {
 		assertThat(startingPosition.board()).isEqualTo(TakBoard.ofSize(size));
 		assertThat(startingPosition.nextToMove()).isEqualTo(TakPlayer.WHITE);
 
-		assertThat(startingPosition.inventory(TakPlayer.WHITE)).isNotEmpty();
-		assertThat(startingPosition.inventory(TakPlayer.BLACK)).isNotEmpty();
+		assertThat(startingPosition.playerInventory(TakPlayer.WHITE)).isNotEmpty();
+		assertThat(startingPosition.playerInventory(TakPlayer.BLACK)).isNotEmpty();
 	}
 
 	@Property
@@ -32,8 +32,8 @@ class GameProperties {
 	void initial_inventory(@ForAll int boardSize, @ForAll int expectedFlats, @ForAll int expectedCaps) {
 		TakPosition startingPosition = new GameOfTak(boardSize).position();
 
-		List<TakStone> whiteInventory = startingPosition.inventory(TakPlayer.WHITE);
-		List<TakStone> blackInventory = startingPosition.inventory(TakPlayer.BLACK);
+		List<TakStone> whiteInventory = startingPosition.playerInventory(TakPlayer.WHITE);
+		List<TakStone> blackInventory = startingPosition.playerInventory(TakPlayer.BLACK);
 		assertThat(whiteInventory).hasSameSizeAs(blackInventory);
 		assertThat(whiteInventory).allMatch(stone -> stone.colour() == TakStone.Colour.WHITE);
 		assertThat(blackInventory).allMatch(stone -> stone.colour() == TakStone.Colour.BLACK);

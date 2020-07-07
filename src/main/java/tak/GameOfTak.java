@@ -6,18 +6,21 @@ public class GameOfTak {
 	public enum Status {
 		PRELUDE_WHITE {
 			@Override
-			TakPlayer nextToMove() {
-				return TakPlayer.WHITE;
+			public boolean isPrelude() {
+				return true;
 			}
 		},
 		PRELUDE_BLACK {
 			@Override
-			TakPlayer nextToMove() {
-				return TakPlayer.BLACK;
+			public boolean isPrelude() {
+				return true;
 			}
-		};
+		},
+		WHITE_TO_MOVE;
 
-		abstract TakPlayer nextToMove();
+		public boolean isPrelude() {
+			return false;
+		}
 	}
 
 	private final int size;

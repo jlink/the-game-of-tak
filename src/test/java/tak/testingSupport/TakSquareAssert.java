@@ -21,4 +21,9 @@ public class TakSquareAssert extends AbstractAssert<TakSquareAssert, TakSquare> 
 		}
 		return this;
 	}
+
+	public TakSquareAssert hasStack(final TakStone ... stones) {
+		Assertions.assertThat(actual.stack()).containsExactly(stones);
+		return this;
+	}
 }
