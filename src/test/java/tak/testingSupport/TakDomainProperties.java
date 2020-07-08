@@ -3,7 +3,6 @@ package tak.testingSupport;
 import java.util.*;
 
 import tak.*;
-import tak.TakBoard.*;
 
 import net.jqwik.api.*;
 import net.jqwik.api.Tuple.*;
@@ -14,11 +13,11 @@ import static tak.testingSupport.TakAssertions.*;
 class TakDomainProperties {
 
 	@Property
-	void generatedStonesAreValid(@ForAll TakStone stone) {
+	void generatedStonesAreValid(@ForAll Stone stone) {
 		assertThat(isValid(stone)).isTrue();
 	}
 
-	private boolean isValid(final TakStone stone) {
+	private boolean isValid(final Stone stone) {
 		if (stone.isCapstone()) {
 			return stone.isStanding();
 		}
@@ -26,34 +25,34 @@ class TakDomainProperties {
 	}
 
 	@Property
-	void generatedStacksAreValid(@ForAll Deque<TakStone> stack) {
+	void generatedStacksAreValid(@ForAll Deque<Stone> stack) {
 		assertThat(isValid(stack)).isTrue();
 	}
-	private boolean isValid(final Deque<TakStone> stack) {
-		if (TakDomainContext.count(stack, TakStone::isStanding) > 1) {
+	private boolean isValid(final Deque<Stone> stack) {
+		if (TakDomainContext.count(stack, Stone::isStanding) > 1) {
 			return false;
 		}
-		if (TakDomainContext.count(stack, TakStone::isStanding) == 1) {
+		if (TakDomainContext.count(stack, Stone::isStanding) == 1) {
 			return stack.peekFirst().isStanding();
 		}
 		return true;
 	}
 
 	@Property
-	void boardAndSpot(@ForAll Tuple2<TakBoard, Spot> boardAndSpot) {
-		TakBoard board = boardAndSpot.get1();
+	void boardAndSpot(@ForAll Tuple2<tak.Board, Spot> boardAndSpot) {
+		tak.Board board = boardAndSpot.get1();
 		Spot spot = boardAndSpot.get2();
-		assertThat(board.at(spot)).isInstanceOf(TakSquare.class);
+		assertThat(board.at(spot)).isInstanceOf(Square.class);
 	}
 
 
 	@Property(tries =  10)
-	void emptyBoards(@ForAll @Board(empty = true) TakBoard board) {
+	void emptyBoards(@ForAll @Board(empty = true) tak.Board board) {
 		assertThat(board).isEmpty();
 	}
 
 	@Property(tries =  10)
-	void boardsWithStones(@ForAll TakBoard board) {
+	void boardsWithStones(@ForAll tak.Board board) {
 		// List<String> lines = TakPrinter.print(board);
 		// lines.forEach(System.out::println);
 		// System.out.println();

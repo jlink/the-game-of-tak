@@ -20,16 +20,34 @@ public class GameOfTak {
 			}
 		},
 		ONGOING,
-		FINISHED;
+		ROAD_WIN_WHITE {
+			@Override
+			public boolean isFinished() {
+				return true;
+			}
+
+			@Override
+			public String toPTN() {
+				return "R-0";
+			}
+		};
 
 		public boolean isPrelude() {
 			return false;
 		}
+
+		public boolean isFinished() {
+			return false;
+		}
+
+		public String toPTN() {
+			return "???";
+		}
 	}
 
 	private final int size;
-	private final List<TakMove> moves = new ArrayList<>();
-	private TakPosition position;
+	private final List<Move> moves = new ArrayList<>();
+	private Position position;
 	private Status status;
 
 	public GameOfTak(final int size) {
@@ -38,28 +56,28 @@ public class GameOfTak {
 		this.status = Status.PRELUDE_WHITE;
 	}
 
-	private TakPosition createStartingPosition(final int size) {
-		TakBoard board = TakBoard.ofSize(size);
-		TakPlayer firstToMove = TakPlayer.WHITE;
-		Map<TakPlayer, List<TakStone>> inventory = createInventory(size);
-		return new TakPosition(board, firstToMove, inventory);
+	private Position createStartingPosition(final int size) {
+		Board board = Board.ofSize(size);
+		Player firstToMove = Player.WHITE;
+		Map<Player, List<Stone>> inventory = createInventory(size);
+		return new Position(board, firstToMove, inventory);
 	}
 
-	private Map<TakPlayer, List<TakStone>> createInventory(final int size) {
+	private Map<Player, List<Stone>> createInventory(final int size) {
 		return Map.of(
-				TakPlayer.WHITE, inventoryStones(size, TakPlayer.WHITE),
-				TakPlayer.BLACK, inventoryStones(size, TakPlayer.BLACK)
+				Player.WHITE, inventoryStones(size, Player.WHITE),
+				Player.BLACK, inventoryStones(size, Player.BLACK)
 		);
 	}
 
-	private List<TakStone> inventoryStones(final int size, final TakPlayer player) {
-		List<TakStone> stones = new ArrayList<>();
+	private List<Stone> inventoryStones(final int size, final Player player) {
+		List<Stone> stones = new ArrayList<>();
 		addFlats(stones, player, size);
 		addCaps(stones, player, size);
 		return stones;
 	}
 
-	private void addFlats(final List<TakStone> stones, final TakPlayer player, final int size) {
+	private void addFlats(final List<Stone> stones, final Player player, final int size) {
 		int flats = switch (size) {
 			case 3 -> 10;
 			case 4 -> 15;
@@ -70,11 +88,11 @@ public class GameOfTak {
 			default -> 0;
 		};
 		for (int i = 0; i < flats; i++) {
-			stones.add(TakStone.flat(player.stoneColour()));
+			stones.add(Stone.flat(player.stoneColour()));
 		}
 	}
 
-	private void addCaps(final List<TakStone> stones, final TakPlayer player, final int size) {
+	private void addCaps(final List<Stone> stones, final Player player, final int size) {
 		int caps = switch (size) {
 			case 3 -> 0;
 			case 4 -> 0;
@@ -85,7 +103,7 @@ public class GameOfTak {
 			default -> 0;
 		};
 		for (int i = 0; i < caps; i++) {
-			stones.add(TakStone.capstone(player.stoneColour()));
+			stones.add(Stone.capstone(player.stoneColour()));
 		}
 	}
 
@@ -93,11 +111,11 @@ public class GameOfTak {
 		return size;
 	}
 
-	public TakPosition position() {
+	public Position position() {
 		return position;
 	}
 
-	public List<TakMove> moves() {
+	public List<Move> moves() {
 		return moves;
 	}
 
@@ -105,8 +123,12 @@ public class GameOfTak {
 		return status;
 	}
 
-	public void makeMove(final TakMove move) {
-		TakMove.Result result = move.execute(position, status);
+	public boolean isFinished() {
+		return status.isFinished();
+	}
+
+	public void makeMove(final Move move) {
+		Move.Result result = move.execute(position, status);
 		status = result.status();
 		position = result.position();
 		moves.add(move);
@@ -116,4 +138,5 @@ public class GameOfTak {
 	public String toString() {
 		return String.format("GameOfTak(%s):%s", size, moves);
 	}
+
 }

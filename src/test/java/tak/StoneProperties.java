@@ -10,12 +10,12 @@ import static org.assertj.core.api.Assertions.*;
 class StoneProperties {
 
 	@Property
-	void noStoneCanBeCapstoneAndFlat(@ForAll TakStone stone) {
+	void noStoneCanBeCapstoneAndFlat(@ForAll Stone stone) {
 		assertThat(isValid(stone)).isTrue();
 	}
 
 	@Property
-	void flattening(@ForAll TakStone stone) {
+	void flattening(@ForAll Stone stone) {
 		if (stone.isCapstone() || !stone.isStanding()) {
 			assertThatThrownBy(() -> stone.flatten()).isInstanceOf(TakException.class);
 		} else {
@@ -24,7 +24,7 @@ class StoneProperties {
 	}
 
 	@Property
-	void puttingUp(@ForAll TakStone stone) {
+	void puttingUp(@ForAll Stone stone) {
 		if (stone.isStanding()) {
 			assertThatThrownBy(() -> stone.standUp()).isInstanceOf(TakException.class);
 		} else {
@@ -33,7 +33,7 @@ class StoneProperties {
 	}
 
 	@Property
-	void ptn(@ForAll TakStone stone) {
+	void ptn(@ForAll Stone stone) {
 		if (stone.isCapstone()) {
 			assertThat(stone.toPTN()).isEqualTo("C");
 		} else if (stone.isStanding()) {
@@ -43,7 +43,18 @@ class StoneProperties {
 		}
 	}
 
-	private boolean isValid(final TakStone stone) {
+	@Property
+	void canBuildRoad(@ForAll Stone stone) {
+		if (stone.isCapstone()) {
+			assertThat(stone.canBuildRoad()).isTrue();
+		} else if (stone.isStanding()) {
+			assertThat(stone.canBuildRoad()).isFalse();
+		} else {
+			assertThat(stone.canBuildRoad()).isTrue();
+		}
+	}
+
+	private boolean isValid(final Stone stone) {
 		if (stone.isCapstone() && !stone.isStanding()) {
 			return false;
 		}

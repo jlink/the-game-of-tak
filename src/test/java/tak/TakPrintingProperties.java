@@ -10,32 +10,32 @@ import net.jqwik.api.constraints.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static tak.TakPrinter.*;
-import static tak.TakStone.Colour.*;
+import static tak.Stone.Colour.*;
 
 @TakDomain
 class TakPrintingProperties {
 
 	@Property
 	@FromData("stonesWithPrintString")
-	void stones(@ForAll TakStone stone, @ForAll String representation) {
+	void stones(@ForAll Stone stone, @ForAll String representation) {
 		String printedStone = TakPrinter.print(stone);
 		assertThat(printedStone).isEqualTo(representation);
 	}
 
 	@Data
-	List<Tuple2<TakStone, String>> stonesWithPrintString() {
+	List<Tuple2<Stone, String>> stonesWithPrintString() {
 		return List.of(
-				Tuple.of(TakStone.capstone(WHITE), TakPrinter.codePoint(0x24b8)), //Ⓒ
-				Tuple.of(TakStone.capstone(BLACK), TakPrinter.codePoint(0x1F152)), //🅒
-				Tuple.of(TakStone.flat(WHITE), TakPrinter.codePoint(0x1F135)), //🄵
-				Tuple.of(TakStone.flat(BLACK), TakPrinter.codePoint(0x1F175)), //🅵
-				Tuple.of(TakStone.flat(WHITE).standUp(), TakPrinter.codePoint(0x1F142)), //🅂
-				Tuple.of(TakStone.flat(BLACK).standUp(), TakPrinter.codePoint(0x1F182)) //🆂
+				Tuple.of(Stone.capstone(WHITE), TakPrinter.codePoint(0x24b8)), //Ⓒ
+				Tuple.of(Stone.capstone(BLACK), TakPrinter.codePoint(0x1F152)), //🅒
+				Tuple.of(Stone.flat(WHITE), TakPrinter.codePoint(0x1F135)), //🄵
+				Tuple.of(Stone.flat(BLACK), TakPrinter.codePoint(0x1F175)), //🅵
+				Tuple.of(Stone.flat(WHITE).standUp(), TakPrinter.codePoint(0x1F142)), //🅂
+				Tuple.of(Stone.flat(BLACK).standUp(), TakPrinter.codePoint(0x1F182)) //🆂
 		);
 	}
 
 	@Property
-	void stacks(@ForAll Deque<TakStone> stack) {
+	void stacks(@ForAll Deque<Stone> stack) {
 		List<String> printedStack = TakPrinter.print(stack);
 		if (stack.isEmpty()) {
 			assertThat(printedStack).hasSize(1);
@@ -46,8 +46,8 @@ class TakPrintingProperties {
 	}
 
 	@Property
-	void squares(@ForAll Deque<TakStone> stack) {
-		TakSquare square = new TakSquare(stack);
+	void squares(@ForAll Deque<Stone> stack) {
+		Square square = new Square(stack);
 		List<String> printedSquare = TakPrinter.print(square);
 		if (stack.isEmpty()) {
 			assertThat(printedSquare).hasSize(1);
@@ -60,9 +60,9 @@ class TakPrintingProperties {
 
 	@Property
 	void emtpyRank(@ForAll @IntRange(min = 3, max = 8) int boardSize) {
-		List<TakSquare> rank = new ArrayList<>();
+		List<Square> rank = new ArrayList<>();
 		for (int i = 0; i < boardSize; i++) {
-			rank.add(new TakSquare());
+			rank.add(new Square());
 		}
 
 		List<String> rankLines = printRank("1", rank);
@@ -76,7 +76,7 @@ class TakPrintingProperties {
 	}
 
 	@Property
-	void ranks(@ForAll @Size(min = 3, max = 8) List<TakSquare> rank) {
+	void ranks(@ForAll @Size(min = 3, max = 8) List<Square> rank) {
 
 		List<String> rankLines = printRank(rankName(8), rank);
 		// printLines(rankLines);
@@ -91,7 +91,7 @@ class TakPrintingProperties {
 	}
 
 	@Property
-	void emptyBoard(@ForAll @Board(empty = true) TakBoard board) {
+	void emptyBoard(@ForAll @tak.testingSupport.Board(empty = true) Board board) {
 
 		List<String> boardLines = TakPrinter.print(board);
 		// printLines(boardLines);
@@ -116,7 +116,7 @@ class TakPrintingProperties {
 	}
 
 	@Property(tries = 10)
-	void nonEmptyBoard(@ForAll @Board(empty = false) TakBoard board) {
+	void nonEmptyBoard(@ForAll @tak.testingSupport.Board(empty = false) Board board) {
 
 		List<String> boardLines = TakPrinter.print(board);
 		// printLines(boardLines);
@@ -144,7 +144,7 @@ class TakPrintingProperties {
 		assertThat(lastLine).endsWith(VERTICAL_DIVIDER + EMPTY_SQUARE);
 	}
 
-	private int maxStones(final List<TakSquare> rank) {
+	private int maxStones(final List<Square> rank) {
 		return rank.stream().mapToInt(square -> square.stack().size()).max().orElse(0);
 	}
 

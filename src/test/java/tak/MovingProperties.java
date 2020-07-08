@@ -16,64 +16,64 @@ class MovingProperties {
 	class Prelude {
 		@Property
 		void initialPlacing(@ForAll @Game(isNew = true) GameOfTak game) {
-			int flatsBefore = countInventoryFlats(game.position(), TakPlayer.BLACK);
-			TakStone stoneToPlace = TakStone.flat(TakStone.Colour.BLACK);
-			TakMove placeOnA1 = TakMove.place(
-					TakPlayer.WHITE,
+			int flatsBefore = countInventoryFlats(game.position(), Player.BLACK);
+			Stone stoneToPlace = Stone.flat(Stone.Colour.BLACK);
+			Move placeOnA1 = Move.place(
+					Player.WHITE,
 					stoneToPlace,
-					TakBoard.spot('a', 1)
+					Spot.of('a', 1)
 			);
 			game.makeMove(placeOnA1);
 
 			assertThat(game.moves()).containsExactly(placeOnA1);
 			assertThat(game.status()).isEqualTo(GameOfTak.Status.PRELUDE_BLACK);
 
-			TakPosition position = game.position();
-			assertThat(position.board().at(TakBoard.spot('a', 1))).hasStack(stoneToPlace);
-			assertThat(countInventoryFlats(position, TakPlayer.BLACK)).isEqualTo(flatsBefore - 1);
-			assertThat(position.nextToMove()).isEqualTo(TakPlayer.BLACK);
+			Position position = game.position();
+			assertThat(position.board().at(Spot.of('a', 1))).hasStack(stoneToPlace);
+			assertThat(countInventoryFlats(position, Player.BLACK)).isEqualTo(flatsBefore - 1);
+			assertThat(position.nextToMove()).isEqualTo(Player.BLACK);
 		}
 
 		@Property
 		void finishPrelude(@ForAll @Game(isNew = true) GameOfTak game) {
-			TakMove placeOnA1 = TakMove.place(
-					TakPlayer.WHITE,
-					TakStone.flat(TakStone.Colour.BLACK),
-					TakBoard.spot('a', 1)
+			Move placeOnA1 = Move.place(
+					Player.WHITE,
+					Stone.flat(Stone.Colour.BLACK),
+					Spot.of('a', 1)
 			);
 			game.makeMove(placeOnA1);
 
-			int flatsBefore = countInventoryFlats(game.position(), TakPlayer.WHITE);
-			TakStone stoneToPlace = TakStone.flat(TakStone.Colour.WHITE);
-			TakMove placeOnC3 = TakMove.place(
-					TakPlayer.BLACK,
+			int flatsBefore = countInventoryFlats(game.position(), Player.WHITE);
+			Stone stoneToPlace = Stone.flat(Stone.Colour.WHITE);
+			Move placeOnC3 = Move.place(
+					Player.BLACK,
 					stoneToPlace,
-					TakBoard.spot('c', 3)
+					Spot.of('c', 3)
 			);
 			game.makeMove(placeOnC3);
 
 			assertThat(game.moves()).containsExactly(placeOnA1, placeOnC3);
 			assertThat(game.status()).isEqualTo(GameOfTak.Status.ONGOING);
 
-			TakPosition position = game.position();
-			assertThat(position.board().at(TakBoard.spot('c', 3))).hasStack(stoneToPlace);
-			assertThat(countInventoryFlats(position, TakPlayer.WHITE)).isEqualTo(flatsBefore - 1);
-			assertThat(position.nextToMove()).isEqualTo(TakPlayer.WHITE);
+			Position position = game.position();
+			assertThat(position.board().at(Spot.of('c', 3))).hasStack(stoneToPlace);
+			assertThat(countInventoryFlats(position, Player.WHITE)).isEqualTo(flatsBefore - 1);
+			assertThat(position.nextToMove()).isEqualTo(Player.WHITE);
 		}
 
 		@Property
 		void onlyFlatStonesCanBePlacedInPrelude(@ForAll @Game(isNew = true) GameOfTak game) {
-			TakMove placeCapstone = TakMove.place(
-					TakPlayer.WHITE,
-					TakStone.capstone(TakStone.Colour.BLACK),
-					TakBoard.spot('a', 1)
+			Move placeCapstone = Move.place(
+					Player.WHITE,
+					Stone.capstone(Stone.Colour.BLACK),
+					Spot.of('a', 1)
 			);
 			assertThatThrownBy(() -> game.makeMove(placeCapstone)).isInstanceOf(TakException.class);
 
-			TakMove placeStandingStone = TakMove.place(
-					TakPlayer.WHITE,
-					TakStone.flat(TakStone.Colour.BLACK).standUp(),
-					TakBoard.spot('a', 1)
+			Move placeStandingStone = Move.place(
+					Player.WHITE,
+					Stone.flat(Stone.Colour.BLACK).standUp(),
+					Spot.of('a', 1)
 			);
 			assertThatThrownBy(() -> game.makeMove(placeStandingStone)).isInstanceOf(TakException.class);
 
@@ -82,17 +82,17 @@ class MovingProperties {
 
 		@Property
 		void cannotPlaceOnOccupiedSpot(@ForAll @Game(isNew = true) GameOfTak game) {
-			TakMove placeFirst = TakMove.place(
-					TakPlayer.WHITE,
-					TakStone.flat(TakStone.Colour.BLACK),
-					TakBoard.spot('a', 1)
+			Move placeFirst = Move.place(
+					Player.WHITE,
+					Stone.flat(Stone.Colour.BLACK),
+					Spot.of('a', 1)
 			);
 			game.makeMove(placeFirst);
 
-			TakMove placeOnSameSpot = TakMove.place(
-					TakPlayer.BLACK,
-					TakStone.flat(TakStone.Colour.WHITE),
-					TakBoard.spot('a', 1)
+			Move placeOnSameSpot = Move.place(
+					Player.BLACK,
+					Stone.flat(Stone.Colour.WHITE),
+					Spot.of('a', 1)
 			);
 
 			assertThatThrownBy(() -> game.makeMove(placeOnSameSpot)).isInstanceOf(TakException.class);
@@ -105,26 +105,31 @@ class MovingProperties {
 	@Group
 	class StandardPlacings {
 
-		@Property
-		void takingTurns(@ForAll Tuple.Tuple2<@Game(isNew = true) GameOfTak, List<TakBoard.Spot>> gameAndSpots) {
+		// Shrinking does not work with stateful games :-(
+		@Property(shrinking = ShrinkingMode.OFF)
+		void takingTurns(@ForAll Tuple.Tuple2<@Game(isNew = true) GameOfTak, List<Spot>> gameAndSpots) {
 			GameOfTak game = gameAndSpots.get1();
-			List<TakBoard.Spot> originalSpots = gameAndSpots.get2();
-			ArrayList<TakBoard.Spot> spots = new ArrayList<>(originalSpots);
+			List<Spot> originalSpots = gameAndSpots.get2();
+			ArrayList<Spot> spots = new ArrayList<>(originalSpots);
 			playPrelude(game, spots.remove(0), spots.remove(0));
 
-			for (TakBoard.Spot spot : spots) {
-				TakPlayer player = game.position().nextToMove();
-				TakMove move = TakMove.place(player, TakStone.flat(player.stoneColour()), spot);
+			int countMadeMoves = 2; // Prelude is 2 moves
+			for (Spot spot : spots) {
+				Player player = game.position().nextToMove();
+				Move move = Move.place(player, Stone.flat(player.stoneColour()), spot);
 				game.makeMove(move);
-				assertThat(game.status()).isEqualTo(GameOfTak.Status.ONGOING);
+				countMadeMoves++;
+				if (game.status().isFinished()) {
+					break;
+				}
 			}
 
-			assertThat(game.moves()).hasSize(originalSpots.size());
+			assertThat(game.moves()).hasSize(countMadeMoves);
 		}
 
-		private void playPrelude(final GameOfTak game, final TakBoard.Spot first, final TakBoard.Spot second) {
-			TakMove whitePrelude = TakMove.place(TakPlayer.WHITE, TakStone.flat(TakStone.Colour.BLACK), first);
-			TakMove blackPrelude = TakMove.place(TakPlayer.BLACK, TakStone.flat(TakStone.Colour.WHITE), second);
+		private void playPrelude(final GameOfTak game, final Spot first, final Spot second) {
+			Move whitePrelude = Move.place(Player.WHITE, Stone.flat(Stone.Colour.BLACK), first);
+			Move blackPrelude = Move.place(Player.BLACK, Stone.flat(Stone.Colour.WHITE), second);
 			game.makeMove(whitePrelude);
 			game.makeMove(blackPrelude);
 		}
@@ -133,18 +138,46 @@ class MovingProperties {
 	@Property
 	// TODO: Generate any valid game. Currently this test only tests new games
 	void onlyPlayerAtTurnCanPlay(@ForAll @Game(isNew = true) GameOfTak game) {
-		TakPlayer wrongPlayer = game.position().nextToMove().opponent();
-		TakMove wrongPlayerMove = TakMove.place(
+		Player wrongPlayer = game.position().nextToMove().opponent();
+		Move wrongPlayerMove = Move.place(
 				wrongPlayer,
-				TakStone.flat(TakStone.Colour.BLACK),
-				TakBoard.spot('a', 1)
+				Stone.flat(Stone.Colour.BLACK),
+				Spot.of('a', 1)
 		);
 		assertThatThrownBy(() -> game.makeMove(wrongPlayerMove)).isInstanceOf(TakException.class);
 
 		assertThat(game.moves()).hasSize(0);
 	}
 
-	private int countInventoryFlats(final TakPosition position, final TakPlayer player) {
+	@Group
+	class Winning {
+
+		@Example
+		void whiteWinsThroughRoad() {
+			GameOfTak gameOfTak = new GameOfTak(3);
+			gameOfTak.makeMove(Move.place(
+					Player.WHITE, Stone.flat(Stone.Colour.BLACK), Spot.of('c', 3)
+			));
+			gameOfTak.makeMove(Move.place(
+					Player.BLACK, Stone.flat(Stone.Colour.WHITE), Spot.of('a', 1)
+			));
+			gameOfTak.makeMove(Move.place(
+					Player.WHITE, Stone.flat(Stone.Colour.WHITE), Spot.of('b', 1)
+			));
+			gameOfTak.makeMove(Move.place(
+					Player.BLACK, Stone.flat(Stone.Colour.BLACK), Spot.of('b', 3)
+			));
+			gameOfTak.makeMove(Move.place(
+					Player.WHITE, Stone.flat(Stone.Colour.WHITE), Spot.of('c', 1)
+			));
+			assertThat(gameOfTak.isFinished()).isTrue();
+			assertThat(gameOfTak.status()).isEqualTo(GameOfTak.Status.ROAD_WIN_WHITE);
+			assertThat(gameOfTak.status().toPTN()).isEqualTo("R-0");
+		}
+
+	}
+
+	private int countInventoryFlats(final Position position, final Player player) {
 		return TakTestingSupport.count(position.playerInventory(player), s -> !s.isCapstone());
 	}
 }

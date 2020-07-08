@@ -3,8 +3,8 @@ package tak.testingSupport;
 import org.assertj.core.api.*;
 import tak.*;
 
-public class TakSquareAssert extends AbstractAssert<TakSquareAssert, TakSquare> {
-	public TakSquareAssert(final TakSquare actual) {
+public class TakSquareAssert extends AbstractAssert<TakSquareAssert, Square> {
+	public TakSquareAssert(final Square actual) {
 		super(actual, TakSquareAssert.class);
 	}
 
@@ -22,7 +22,7 @@ public class TakSquareAssert extends AbstractAssert<TakSquareAssert, TakSquare> 
 		return this;
 	}
 
-	public TakSquareAssert hasStack(final TakStone ... stones) {
+	public TakSquareAssert hasStack(final Stone... stones) {
 		Assertions.assertThat(actual.stack()).containsExactly(stones);
 		return this;
 	}

@@ -19,29 +19,29 @@ class GameProperties {
 		assertThat(game.moves()).isEmpty();
 		assertThat(game.status()).isEqualTo(GameOfTak.Status.PRELUDE_WHITE);
 
-		TakPosition startingPosition = game.position();
-		assertThat(startingPosition.board()).isEqualTo(TakBoard.ofSize(size));
-		assertThat(startingPosition.nextToMove()).isEqualTo(TakPlayer.WHITE);
+		Position startingPosition = game.position();
+		assertThat(startingPosition.board()).isEqualTo(Board.ofSize(size));
+		assertThat(startingPosition.nextToMove()).isEqualTo(Player.WHITE);
 
-		assertThat(startingPosition.playerInventory(TakPlayer.WHITE)).isNotEmpty();
-		assertThat(startingPosition.playerInventory(TakPlayer.BLACK)).isNotEmpty();
+		assertThat(startingPosition.playerInventory(Player.WHITE)).isNotEmpty();
+		assertThat(startingPosition.playerInventory(Player.BLACK)).isNotEmpty();
 	}
 
 	@Property
 	@FromData("inventories")
 	void initial_inventory(@ForAll int boardSize, @ForAll int expectedFlats, @ForAll int expectedCaps) {
-		TakPosition startingPosition = new GameOfTak(boardSize).position();
+		Position startingPosition = new GameOfTak(boardSize).position();
 
-		List<TakStone> whiteInventory = startingPosition.playerInventory(TakPlayer.WHITE);
-		List<TakStone> blackInventory = startingPosition.playerInventory(TakPlayer.BLACK);
+		List<Stone> whiteInventory = startingPosition.playerInventory(Player.WHITE);
+		List<Stone> blackInventory = startingPosition.playerInventory(Player.BLACK);
 		assertThat(whiteInventory).hasSameSizeAs(blackInventory);
-		assertThat(whiteInventory).allMatch(stone -> stone.colour() == TakStone.Colour.WHITE);
-		assertThat(blackInventory).allMatch(stone -> stone.colour() == TakStone.Colour.BLACK);
+		assertThat(whiteInventory).allMatch(stone -> stone.colour() == Stone.Colour.WHITE);
+		assertThat(blackInventory).allMatch(stone -> stone.colour() == Stone.Colour.BLACK);
 
 		assertThat(TakTestingSupport.count(whiteInventory, s -> !s.isCapstone())).isEqualTo(expectedFlats);
-		assertThat(TakTestingSupport.count(whiteInventory, TakStone::isCapstone)).isEqualTo(expectedCaps);
+		assertThat(TakTestingSupport.count(whiteInventory, Stone::isCapstone)).isEqualTo(expectedCaps);
 		assertThat(TakTestingSupport.count(blackInventory, s -> !s.isCapstone())).isEqualTo(expectedFlats);
-		assertThat(TakTestingSupport.count(blackInventory, TakStone::isCapstone)).isEqualTo(expectedCaps);
+		assertThat(TakTestingSupport.count(blackInventory, Stone::isCapstone)).isEqualTo(expectedCaps);
 	}
 
 	@Data

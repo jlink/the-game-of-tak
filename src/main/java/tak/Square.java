@@ -2,15 +2,15 @@ package tak;
 
 import java.util.*;
 
-public class TakSquare {
+public class Square {
 
-	private final Deque<TakStone> stack;
+	private final Deque<Stone> stack;
 
-	public TakSquare() {
+	public Square() {
 		this(new ArrayDeque<>());
 	}
 
-	public TakSquare(Deque<TakStone> stack) {
+	public Square(Deque<Stone> stack) {
 		this.stack = stack;
 	}
 
@@ -39,16 +39,16 @@ public class TakSquare {
 		return !isEmpty();
 	}
 
-	public TakSquare set(final Deque<TakStone> stack) {
-		return new TakSquare(stack);
+	public Square set(final Deque<Stone> stack) {
+		return new Square(stack);
 	}
 
-	public Deque<TakStone> stack() {
+	public Deque<Stone> stack() {
 		// Copy to make it unmodifiable
 		return new ArrayDeque<>(stack);
 	}
 
-	public Optional<TakStone> top() {
+	public Optional<Stone> top() {
 		return Optional.ofNullable(stack.peekFirst());
 	}
 

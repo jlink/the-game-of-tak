@@ -14,7 +14,7 @@ public class TakPrinter {
 		return new String(charPair);
 	}
 
-	public static String print(final TakStone stone) {
+	public static String print(final Stone stone) {
 		switch (stone.colour()) {
 			case WHITE:
 				if (stone.isCapstone()) {
@@ -37,18 +37,18 @@ public class TakPrinter {
 		}
 	}
 
-	public static List<String> print(final Deque<TakStone> stack) {
+	public static List<String> print(final Deque<Stone> stack) {
 		if (stack.isEmpty()) {
 			return List.of(EMPTY_SQUARE);
 		}
 		return stack.stream().map(TakPrinter::print).collect(Collectors.toList());
 	}
 
-	public static List<String> print(final TakSquare square) {
+	public static List<String> print(final Square square) {
 		return print(square.stack()).stream().map(s -> VERTICAL_DIVIDER + s).collect(Collectors.toList());
 	}
 
-	public static List<String> printRank(final String rankName, final List<TakSquare> rankSquares) {
+	public static List<String> printRank(final String rankName, final List<Square> rankSquares) {
 		List<String> lines = new ArrayList<>();
 		int maxStack = Math.max(
 				1,
@@ -61,7 +61,7 @@ public class TakPrinter {
 		return lines;
 	}
 
-	private static String rankLine(final String rankName, final List<TakSquare> rankSquares, final int index) {
+	private static String rankLine(final String rankName, final List<Square> rankSquares, final int index) {
 		String squares = rankSquares.stream()
 									.map(square -> {
 										List<String> squareLines = print(square);
@@ -72,14 +72,14 @@ public class TakPrinter {
 		return String.format("%s%s%s%s", rankName, squares, VERTICAL_DIVIDER, rankName);
 	}
 
-	public static List<String> print(final TakBoard board) {
+	public static List<String> print(final Board board) {
 		ArrayList<String> lines = new ArrayList<>();
 		String letterLine = letterLine(board.size());
 		String dividerLine = dividerLine(board.size());
 		lines.add(letterLine);
 		for (int rank = board.size(); rank > 0; rank--) {
 			lines.add(dividerLine);
-			List<TakSquare> rankSquares = board.rank(rank);
+			List<Square> rankSquares = board.rank(rank);
 			List<String> rankLines = rankLines(rankName(rank), rankSquares);
 			lines.addAll(rankLines);
 		}
@@ -88,7 +88,7 @@ public class TakPrinter {
 		return lines;
 	}
 
-	private static List<String> rankLines(final String rankName, final List<TakSquare> rank) {
+	private static List<String> rankLines(final String rankName, final List<Square> rank) {
 		return printRank(rankName, rank);
 	}
 

@@ -2,7 +2,7 @@ package tak;
 
 import java.util.*;
 
-public class TakStone {
+public class Stone {
 
 	public enum Colour {WHITE, BLACK}
 
@@ -10,23 +10,27 @@ public class TakStone {
 
 	enum Position {STANDING, FLAT}
 
-	public static TakStone capstone(Colour colour) {
-		return new TakStone(colour, Shape.CAPSTONE, Position.STANDING);
+	public static Stone capstone(Colour colour) {
+		return new Stone(colour, Shape.CAPSTONE, Position.STANDING);
 	}
 
-	public static TakStone flat(Colour colour) {
-		return new TakStone(colour, Shape.NORMAL, Position.FLAT);
+	public static Stone flat(Colour colour) {
+		return new Stone(colour, Shape.NORMAL, Position.FLAT);
 	}
 
-	static TakStone copy(final TakStone stone) {
-		return new TakStone(stone.colour, stone.shape, stone.position);
+	public static Deque<Stone> stack(Stone... stones) {
+		return new ArrayDeque<>(Arrays.asList(stones));
+	}
+
+	static Stone copy(final Stone stone) {
+		return new Stone(stone.colour, stone.shape, stone.position);
 	}
 
 	private final Colour colour;
 	private final Shape shape;
 	private final Position position;
 
-	private TakStone(Colour colour, Shape shape, Position position) {
+	private Stone(Colour colour, Shape shape, Position position) {
 		this.colour = colour;
 		this.shape = shape;
 		this.position = position;
@@ -54,25 +58,29 @@ public class TakStone {
 		return position == Position.STANDING;
 	}
 
-	public TakStone flatten() {
+	public Stone flatten() {
 		if (!isStanding() || isCapstone()) {
 			throw new TakException(String.format("%s cannot be flattened", toString()));
 		}
-		return new TakStone(colour, shape, Position.FLAT);
+		return new Stone(colour, shape, Position.FLAT);
 	}
 
-	public TakStone standUp() {
+	public Stone standUp() {
 		if (isStanding()) {
 			throw new TakException(String.format("%s cannot stand up", toString()));
 		}
-		return new TakStone(colour, shape, Position.STANDING);
+		return new Stone(colour, shape, Position.STANDING);
+	}
+
+	public boolean canBuildRoad() {
+		return isCapstone() || !isStanding();
 	}
 
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		TakStone takStone = (TakStone) o;
+		Stone takStone = (Stone) o;
 		return colour == takStone.colour &&
 					   shape == takStone.shape &&
 					   position == takStone.position;
