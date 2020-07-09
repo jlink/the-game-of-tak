@@ -93,4 +93,21 @@ public class Spot {
 	public int boardIndex(final Board board) {
 		return rankIndex() * board.size() + fileIndex();
 	}
+
+	public Set<Spot> neighbours(final int boardSize) {
+		HashSet<Spot> spots = new HashSet<>();
+		if (fileIndex() > 0) {
+			spots.add(new Spot(fileIndex() - 1, rankIndex()));
+		}
+		if (fileIndex() < boardSize - 1) {
+			spots.add(new Spot(fileIndex() + 1, rankIndex()));
+		}
+		if (rankIndex() > 0) {
+			spots.add(new Spot(fileIndex(), rankIndex() - 1));
+		}
+		if (rankIndex() < boardSize - 1) {
+			spots.add(new Spot(fileIndex(), rankIndex() + 1));
+		}
+		return spots;
+	}
 }
