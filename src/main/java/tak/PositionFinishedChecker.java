@@ -33,7 +33,7 @@ public class PositionFinishedChecker {
 			area.add(seed);
 			candidateSpots.remove(seed);
 			growConnectedArea(area, candidateSpots, boardSize);
-			if (hasLeftAndRight(area, boardSize)) {
+			if (hasLeftAndRight(area, boardSize) || hasTopAndBottom(area, boardSize)) {
 				return true;
 			}
 		}
@@ -63,6 +63,12 @@ public class PositionFinishedChecker {
 		int rightFile = 'a' + boardSize - 1;
 		boolean hasRight = area.stream().anyMatch(spot -> spot.file() == rightFile);
 		return hasLeft && hasRight;
+	}
+
+	private boolean hasTopAndBottom(final Set<Spot> area, final int boardSize) {
+		boolean hasTop = area.stream().anyMatch(spot -> spot.rank() == 1);
+		boolean hasBottom = area.stream().anyMatch(spot -> spot.rank() == boardSize);
+		return hasTop && hasBottom;
 	}
 
 	private boolean isRoadCandidate(final Square square, final Stone.Colour stoneColour) {

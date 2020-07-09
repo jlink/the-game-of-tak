@@ -28,7 +28,7 @@ class PositionFinishedCheckerProperties {
 	) {
 		Stone.Colour stoneColour = player.stoneColour();
 		int rank = maxRank % emptyBoard.size() + 1;
-		Board board = emptyBoard.change(straightLeftToRightRoad(stoneColour, emptyBoard.size(), rank));
+		Board board = emptyBoard.change(createStraightLeftToRightRoad(stoneColour, emptyBoard.size(), rank));
 		Position position = new Position(board, Player.NONE, new HashMap<>());
 		GameOfTak.Status expectedStatus = switch (player) {
 			case BLACK -> GameOfTak.Status.ROAD_WIN_BLACK;
@@ -41,7 +41,6 @@ class PositionFinishedCheckerProperties {
 
 	@Example
 	void bendedLeftToRightRoad() {
-
 		Map<Spot, Deque<Stone>> changes = new HashMap<>();
 		changes.put(Spot.of('a', 5), Stone.stack(Stone.flat(Stone.Colour.BLACK)));
 		changes.put(Spot.of('b', 5), Stone.stack(Stone.capstone(Stone.Colour.BLACK)));
@@ -93,7 +92,7 @@ class PositionFinishedCheckerProperties {
 		int nextRank = (maxRank + 1) % emptyBoard.size() + 1;
 		Board board =
 				emptyBoard
-						.change(straightLeftToRightRoad(stoneColour, emptyBoard.size(), rank))
+						.change(createStraightLeftToRightRoad(stoneColour, emptyBoard.size(), rank))
 						.change(Map.of(
 								Spot.of('c', rank), Stone.stack(),
 								Spot.of('c', nextRank), Stone.stack(Stone.flat(stoneColour))
@@ -103,7 +102,33 @@ class PositionFinishedCheckerProperties {
 		assertThat(checker.check(position)).isEmpty();
 	}
 
-	private Map<Spot, Deque<Stone>> straightLeftToRightRoad(final Stone.Colour stoneColour, final int boardSize, final int rank) {
+	@Property
+	void straightTopToBottomRoad(
+			@ForAll @EmptyBoard @GameSize(8) Board emptyBoard,
+			@ForAll @CharRange(from = 'a', to = 'h') char file,
+			@ForAll Player player
+	) {
+		Stone.Colour stoneColour = player.stoneColour();
+		Board board = emptyBoard.change(createStraightTopToBottomRoad(stoneColour, emptyBoard.size(), file));
+		Position position = new Position(board, Player.NONE, new HashMap<>());
+		GameOfTak.Status expectedStatus = switch (player) {
+			case BLACK -> GameOfTak.Status.ROAD_WIN_BLACK;
+			case WHITE -> GameOfTak.Status.ROAD_WIN_WHITE;
+			default -> throw new IllegalArgumentException("Not possible");
+		};
+
+		assertThat(checker.check(position)).isEqualTo(Optional.of(expectedStatus));
+	}
+
+	private Map<Spot, Deque<Stone>> createStraightTopToBottomRoad(final Stone.Colour stoneColour, final int boardSize, final char file) {
+		Map<Spot, Deque<Stone>> changes = new HashMap<>();
+		for (int rank = 1; rank <= boardSize; rank++) {
+			changes.put(Spot.of(file, rank), Stone.stack(Stone.flat(stoneColour)));
+		}
+		return changes;
+	}
+
+	private Map<Spot, Deque<Stone>> createStraightLeftToRightRoad(final Stone.Colour stoneColour, final int boardSize, final int rank) {
 		Map<Spot, Deque<Stone>> changes = new HashMap<>();
 		for (char c = 'a'; c < 'a' + boardSize; c++) {
 			changes.put(Spot.of(c, rank), Stone.stack(Stone.flat(stoneColour)));
