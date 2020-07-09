@@ -8,7 +8,6 @@ import net.jqwik.api.*;
 import net.jqwik.api.Tuple.*;
 import net.jqwik.api.constraints.*;
 
-import static tak.Board.*;
 import static tak.Stone.Colour.*;
 import static tak.testingSupport.TakAssertions.*;
 
@@ -34,7 +33,7 @@ class BoardProperties {
 	}
 
 	@Property
-	void newBoard(@ForAll @tak.testingSupport.Board(empty = true) Board board) {
+	void newBoard(@ForAll @EmptyBoard(value = true) Board board) {
 		assertThat(board.size()).isBetween(3, 8);
 
 		assertThat(board.squares()).hasSize(board.size() * board.size());
@@ -53,7 +52,7 @@ class BoardProperties {
 	}
 
 	@Property
-	void canSetStackOnAnySquare(@ForAll Tuple2<@tak.testingSupport.Board(empty = true) Board, Spot> boardAndSpot) {
+	void canSetStackOnAnySquare(@ForAll Tuple2<@EmptyBoard(value = true) Board, Spot> boardAndSpot) {
 		Board emptyBoard = boardAndSpot.get1();
 		Spot spot = boardAndSpot.get2();
 
@@ -71,7 +70,7 @@ class BoardProperties {
 	}
 
 	@Example
-	void toStringRepresentation(@ForAll @tak.testingSupport.Board(empty = true) Board board) {
+	void toStringRepresentation(@ForAll @EmptyBoard(value = true) Board board) {
 		Board boardWithA1andC3occupied = board.change(Map.of(
 				Spot.of('a', 1), Stone.stack(Stone.capstone(WHITE)),
 				Spot.of('c', 3), Stone.stack(Stone.capstone(BLACK), Stone.flat(WHITE))

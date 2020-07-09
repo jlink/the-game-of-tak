@@ -30,6 +30,17 @@ public class GameOfTak {
 			public String toPTN() {
 				return "R-0";
 			}
+		},
+		ROAD_WIN_BLACK {
+			@Override
+			public boolean isFinished() {
+				return true;
+			}
+
+			@Override
+			public String toPTN() {
+				return "0-R";
+			}
 		};
 
 		public boolean isPrelude() {

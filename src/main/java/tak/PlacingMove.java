@@ -35,7 +35,7 @@ class PlacingMove extends Move {
 			case PRELUDE_WHITE -> Status.PRELUDE_BLACK;
 			case PRELUDE_BLACK -> Status.ONGOING;
 			case ONGOING -> Status.ONGOING;
-			case ROAD_WIN_WHITE -> {
+			default -> {
 				String message = "Game already finished";
 				throw new TakException(message);
 			}

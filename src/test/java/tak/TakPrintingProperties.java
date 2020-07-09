@@ -91,7 +91,7 @@ class TakPrintingProperties {
 	}
 
 	@Property
-	void emptyBoard(@ForAll @tak.testingSupport.Board(empty = true) Board board) {
+	void emptyBoard(@ForAll @EmptyBoard(value = true) Board board) {
 
 		List<String> boardLines = TakPrinter.print(board);
 		// printLines(boardLines);
@@ -116,7 +116,7 @@ class TakPrintingProperties {
 	}
 
 	@Property(tries = 10)
-	void nonEmptyBoard(@ForAll @tak.testingSupport.Board(empty = false) Board board) {
+	void nonEmptyBoard(@ForAll @EmptyBoard(value = false) Board board) {
 
 		List<String> boardLines = TakPrinter.print(board);
 		// printLines(boardLines);

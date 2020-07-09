@@ -47,7 +47,7 @@ class TakDomainProperties {
 
 
 	@Property(tries =  10)
-	void emptyBoards(@ForAll @Board(empty = true) tak.Board board) {
+	void emptyBoards(@ForAll @EmptyBoard(value = true) tak.Board board) {
 		assertThat(board).isEmpty();
 	}
 

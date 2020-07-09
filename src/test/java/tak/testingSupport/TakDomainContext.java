@@ -17,6 +17,8 @@ import static tak.Stone.*;
 public class TakDomainContext extends AbstractDomainContextBase {
 
 	public TakDomainContext() {
+		// Have precedence over default providers
+		setDefaultPriority(1);
 		registerProvider(gamesProvider());
 		registerProvider(emptyBoardProvider());
 		registerArbitrary(tupleOfBoardAndSpotType(), boardAndSpot());
@@ -24,6 +26,11 @@ public class TakDomainContext extends AbstractDomainContextBase {
 		registerArbitrary(Stone.class, stones());
 		registerArbitrary(takStack(), stacks());
 		registerArbitrary(Square.class, squares());
+		registerArbitrary(Player.class, players());
+	}
+
+	private Arbitrary<Player> players() {
+		return Arbitraries.of(Player.WHITE, Player.BLACK);
 	}
 
 	private Arbitrary<Tuple2<GameOfTak, List<Spot>>> gameAndSpots() {
@@ -67,8 +74,8 @@ public class TakDomainContext extends AbstractDomainContextBase {
 
 			@Override
 			public Set<Arbitrary<?>> provideFor(TypeUsage targetType, SubtypeProvider subtypeProvider) {
-				Optional<Board> boardAnnotation = targetType.findAnnotation(Board.class);
-				if (boardAnnotation.isPresent() && boardAnnotation.get().empty()) {
+				Optional<EmptyBoard> boardAnnotation = targetType.findAnnotation(EmptyBoard.class);
+				if (boardAnnotation.isPresent() && boardAnnotation.get().value()) {
 					return Set.of(gameSize(targetType).map(tak.Board::ofSize));
 				}
 				return Set.of(gameSize(targetType).flatMap(gameSize -> boards(gameSize)));

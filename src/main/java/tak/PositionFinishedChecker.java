@@ -5,16 +5,21 @@ import java.util.stream.*;
 
 public class PositionFinishedChecker {
 	public Optional<GameOfTak.Status> check(final Position position) {
-		if (roadWinWhite(position)) {
+		if (roadWin(position, Player.WHITE)) {
 			return Optional.of(GameOfTak.Status.ROAD_WIN_WHITE);
+		}
+		if (roadWin(position, Player.BLACK)) {
+			return Optional.of(GameOfTak.Status.ROAD_WIN_BLACK);
 		}
 		return Optional.empty();
 	}
 
-	private boolean roadWinWhite(final Position position) {
+	private boolean roadWin(final Position position, final Player player) {
 		Set<Spot> roadCandidateSpots =
 				position.board().squares().entrySet().stream()
-						.filter(entry -> isRoadCandidate(entry.getValue(), Player.WHITE.stoneColour()))
+						.filter(entry -> {
+							return isRoadCandidate(entry.getValue(), player.stoneColour());
+						})
 						.map(Map.Entry::getKey)
 						.collect(Collectors.toSet());
 		return hasRoadLeftToRight(roadCandidateSpots, position.board().size());
