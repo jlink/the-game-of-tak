@@ -120,6 +120,31 @@ class PositionFinishedCheckerProperties {
 		assertThat(checker.check(position)).isEqualTo(Optional.of(expectedStatus));
 	}
 
+	@Property
+	void when_roadForBoth_lastPlayerWins(
+			@ForAll @EmptyBoard @GameSize(3) Board emptyBoard,
+			@ForAll Player nextPlayer
+	) {
+		Board board = emptyBoard.change(
+				Map.of(
+						Spot.of('a', 1), Stone.stack(Stone.flat(Stone.Colour.WHITE)),
+						Spot.of('a', 2), Stone.stack(Stone.flat(Stone.Colour.WHITE)),
+						Spot.of('a', 3), Stone.stack(Stone.flat(Stone.Colour.WHITE)),
+						Spot.of('b', 1), Stone.stack(Stone.flat(Stone.Colour.BLACK)),
+						Spot.of('b', 2), Stone.stack(Stone.flat(Stone.Colour.BLACK)),
+						Spot.of('b', 3), Stone.stack(Stone.flat(Stone.Colour.BLACK))
+				)
+		);
+		Position position = new Position(board, nextPlayer, new HashMap<>());
+		GameOfTak.Status expectedStatus = switch (nextPlayer) {
+			case BLACK -> GameOfTak.Status.ROAD_WIN_WHITE;
+			case WHITE -> GameOfTak.Status.ROAD_WIN_BLACK;
+			default -> throw new IllegalArgumentException("Not possible");
+		};
+
+		assertThat(checker.check(position)).isEqualTo(Optional.of(expectedStatus));
+	}
+
 	private Map<Spot, Deque<Stone>> createStraightTopToBottomRoad(final Stone.Colour stoneColour, final int boardSize, final char file) {
 		Map<Spot, Deque<Stone>> changes = new HashMap<>();
 		for (int rank = 1; rank <= boardSize; rank++) {

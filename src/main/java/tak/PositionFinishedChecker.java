@@ -5,16 +5,25 @@ import java.util.stream.*;
 
 public class PositionFinishedChecker {
 	public Optional<GameOfTak.Status> check(final Position position) {
-		if (roadWin(position, Player.WHITE)) {
+		boolean whiteHasRoad = hasRoad(position, Player.WHITE);
+		boolean blackHasRoad = hasRoad(position, Player.BLACK);
+		if (whiteHasRoad && !blackHasRoad) {
 			return Optional.of(GameOfTak.Status.ROAD_WIN_WHITE);
 		}
-		if (roadWin(position, Player.BLACK)) {
+		if (blackHasRoad && !whiteHasRoad) {
 			return Optional.of(GameOfTak.Status.ROAD_WIN_BLACK);
+		}
+		if (blackHasRoad && whiteHasRoad) {
+			if (position.nextToMove() == Player.BLACK) {
+				return Optional.of(GameOfTak.Status.ROAD_WIN_WHITE);
+			} else {
+				return Optional.of(GameOfTak.Status.ROAD_WIN_BLACK);
+			}
 		}
 		return Optional.empty();
 	}
 
-	private boolean roadWin(final Position position, final Player player) {
+	private boolean hasRoad(final Position position, final Player player) {
 		Set<Spot> roadCandidateSpots = roadCandidateSpots(position, player);
 		return hasRoad(roadCandidateSpots, position.board().size());
 	}
