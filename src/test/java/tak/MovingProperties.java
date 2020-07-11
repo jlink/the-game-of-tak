@@ -105,8 +105,8 @@ class MovingProperties {
 	@Group
 	class StandardPlacings {
 
-		// Shrinking does not work with stateful games :-(
-		@Property(shrinking = ShrinkingMode.OFF)
+		// Does shrinking work with stateful games?
+		@Property
 		void takingTurns(@ForAll Tuple.Tuple2<@Game(isNew = true) GameOfTak, List<Spot>> gameAndSpots) {
 			GameOfTak game = gameAndSpots.get1();
 			List<Spot> originalSpots = gameAndSpots.get2();
